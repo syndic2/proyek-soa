@@ -1,5 +1,7 @@
 const db= require('./database');
 const express= require('express');
+const fetch= require('node-fetch');
+const request= require('request');
 const jwt= require('jsonwebtoken');
 const multer= require('multer');
 const path= require('path');
