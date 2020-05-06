@@ -6,60 +6,53 @@ const jwt= require('jsonwebtoken');
 const fetch= require('node-fetch');
 
 const router= express.Router();
-
+    
 router.post('/register', async (req, res) => {
     const data= req.body;
 
     if (!Object.keys(data).every(key => data[key])) {
         return res.status(400).json({
-            status: '400 BAD REQUEST',
+            status: 400,
             message: 'Field tidak boleh kosong!'
         });
     }
 
-    let conn= await db.getConn();
-    let query= await db.executeQuery(conn, `
+    let query= await db.executeQuery(`
         SELECT * 
-        FROM user
+        FROM pengguna
         WHERE email_user = '${data.email_user}'
     `);
 
-    conn.release();
-
-    if (query.length) {
+    if (query.rows.length) {
         return res.status(409).json({
             status: 409,
-            message: 'E-mail sudah terpakai.'
+            message: 'E-mail sudah digunakan.'
         });
     }
 
-    conn= await db.getConn();
-    query= await db.executeQuery(conn, `
-        INSERT INTO user
+    query= await db.executeQuery(`
+        INSERT INTO pengguna (email_user, nama_user, password_user, saldo_user, tipe_user, api_key, api_hit)
         VALUES (
-            null, 
-            '${data.email_user}', 
+            '${data.email_user}',
             '${data.nama_user}',
             '${data.password_user}',
             0,
             0,
             '${getAPIKey()}',
-            10 
-        )
+            10
+        ) 
     `);
-    
-    conn.release();
-    
-    if (query.affectedRows === 0) {
+
+    if (query.rowCount === 0) {
         return res.status(500).json({
-            status: '500 INTERNAL SERVER ERROR',
+            status: 500,
             message: 'Terjadi kesalahan. Coba lagi.'
         });
     }
 
     return res.status(200).json({
         status: 200,
-        message: 'Register berhasil.'
+        message: 'Register berhasil'
     });
 });
 
@@ -68,34 +61,31 @@ router.post('/login', async (req, res) => {
 
     if (!Object.keys(data).every(key => data[key])) {
         return res.status(400).json({
-            status: '400 BAD REQUEST',
+            status: 400,
             message: 'Field tidak boleh kosong!'
         });
     }
 
-    let conn= await db.getConn();
-    let query= await db.executeQuery(conn, `
+    let query= await db.executeQuery(`
         SELECT * 
-        FROM user
+        FROM pengguna
         WHERE email_user = '${data.email_user}'
     `);
 
-    conn.release();
-
-    if (!query.length) {
+    if (!query.rows.length) {
         return res.status(404).json({
-            status: '404 NOT FOUND',
+            status: 400,
             message: 'Akun tidak ditemukan.'
         });
     }
 
     const token= jwt.sign({
-        email_user: query[0].email_user,
-        tipe_user: query[0].tipe_user
+        email_user: query.rows[0].email_user.trim(),
+        tipe_user: query.rows[0].tipe_user
     }, 'corona');
 
     return res.status(200).json({
-        status: '200 OK',
+        status: 200,
         message: 'Login berhasil.',
         token: token
     });

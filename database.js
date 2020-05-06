@@ -1,30 +1,16 @@
-const mysql= require('mysql');
-const pool= mysql.createPool({
-    host: 'localhost', 
-    user: 'root',
-    password: '', 
-    database: 'spoonacular'
+const { Client }= require('pg');
+const client= new Client({ 
+    connectionString: 'postgres://proyek-soa:soa@localhost:5432/proyek-soa' 
 });
 
-const getConn= () => {
-    try {
-        return new Promise((resolve, reject) => {
-            pool.getConnection((err, conn) => {
-                if (err) reject(err);
-                else resolve(conn);
-            });
-        });
-    } catch (error) {
-        console.log(error);   
-    }
-};
+client.connect();
 
-const executeQuery= (conn, query) => {
+const executeQuery= (query) => {
     try {
         return new Promise((resolve, reject) => {
-            conn.query(query, (err, res) => {
+            client.query(query, (err, res) => {
                 if (err) reject(err);
-                else resolve(res); 
+                else resolve(res);
             });
         });
     } catch (error) {
@@ -33,6 +19,5 @@ const executeQuery= (conn, query) => {
 };
 
 module.exports= {
-    'getConn': getConn,
     'executeQuery': executeQuery
 };
