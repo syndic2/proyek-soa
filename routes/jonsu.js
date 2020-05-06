@@ -31,8 +31,9 @@ router.post('/register', async (req, res) => {
     }
 
     query= await db.executeQuery(`
-        INSERT INTO pengguna (email_user, nama_user, password_user, saldo_user, tipe_user, api_key, api_hit)
+        INSERT INTO pengguna (id_user, email_user, nama_user, password_user, saldo_user, tipe_user, api_key, api_hit)
         VALUES (
+            0,
             '${data.email_user}',
             '${data.nama_user}',
             '${data.password_user}',
@@ -103,7 +104,7 @@ router.get('/recipe/search', async(req, res) => {
             message: 'Recipe tidak ditemukan.'
         });
     }
-    
+
     return res.status(404).json({
         status: '200 OK',
         message: 'Pencarian berhasil.',
