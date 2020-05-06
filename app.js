@@ -1,17 +1,10 @@
-const db= require('./database');
 const express= require('express');
-const fetch= require('node-fetch');
 const request= require('request');
-const jwt= require('jsonwebtoken');
 const multer= require('multer');
 const path= require('path');
 const fs= require('fs');
 
 const app= express();
-const config= {
-    host: 'https://api.spoonacular.com/recipes',
-    api_key: ''
-};
 
 //MULTER
 const upload= multer({
@@ -46,5 +39,6 @@ const checkFileType = (file, cb) => {
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true}));
+app.use('/api', require('./routes/jonsu'));
 
 app.listen(3000, () => console.log('Server listening on port 3000'));
