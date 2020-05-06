@@ -93,12 +93,12 @@ router.post('/login', async (req, res) => {
 });
 
 router.get('/user', async (req, res) => {
-    let query= await executeQuery(`
+    let query= await db.executeQuery(`
         SELECT *
         FROM pengguna
     `);
 
-    return res.status(404).json({
+    return res.status(200).json({
         status: 200,
         user: query.rows
     });
