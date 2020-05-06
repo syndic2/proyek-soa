@@ -92,6 +92,18 @@ router.post('/login', async (req, res) => {
     });
 });
 
+router.get('/user', async (req, res) => {
+    let query= await executeQuery(`
+        SELECT *
+        FROM pengguna
+    `);
+
+    return res.status(404).json({
+        status: 200,
+        user: query.rows
+    });
+});
+
 router.get('/recipe/search', async(req, res) => {
     const fetchAPI= await fetch(`
         ${thirdPartyAPI.host}/search?apiKey=${thirdPartyAPI.api_key}&query=cheese&number=2`
@@ -100,13 +112,13 @@ router.get('/recipe/search', async(req, res) => {
 
     if (!data.results.length) {
         return res.status(404).json({
-            status: '404 NOT FOUND',
+            status: 400,
             message: 'Recipe tidak ditemukan.'
         });
     }
 
-    return res.status(404).json({
-        status: '200 OK',
+    return res.status(200).json({
+        status: 200,
         message: 'Pencarian berhasil.',
         recipes: data.results
     });
