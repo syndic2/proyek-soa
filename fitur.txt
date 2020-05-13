@@ -1,0 +1,56 @@
+API: https://spoonacular.com/food-api/docs
+
+USER { FREE USER, PREMIUM USER}
+
+FITUR
+
+/api/users
+- /register => POST
+- /login => POST (JWT AUTH)
+- /topUp => POST  (TOKEN)
+- /subscribe => POST (PAYMENT MODEL, TOKEN)
+- /getPremium => PUT (TOKEN)
+- /profile => GET, PUT (TOKEN)
+- /cookPlan => GET, POST, DELETE (TOKEN)
+- /favorite => GET, POST, DELETE (TOKEN)
+- /follow => POST, GET, DELETE (TOKEN)
+- /shareRecipe => POST, GET (TOKEN)
+
+
+/api/recipes
+* search SUDAH TERMASUK INTRUKSI
+
+- /search?{key=k3yku}&{name=cheese}&{limit=10} => GET
+* { required: 'key, name', optional: 'limit' }
+* https://api.spoonacular.com/recipes/{id}/information
+
+- /searchByIngredients?{key=k3yku}&{ingredients=cheese,meat,egg}&{limit=10} => GET
+* { required: 'key, ingredients', optional: 'limit' }
+* https://api.spoonacular.com/recipes/findByIngredients
+
+- /{id_recipe}/similar?{key=k3yku}&{limit=10} => GET (MASUK DB)
+* { required: 'id_recipe, key', optional: 'limit' }
+* https://api.spoonacular.com/recipes/715538/similar
+
+
+/api/meals
+- /generate?{key=k3yku}&{day=sunday}&{exclude=cheese,egg} => GET (MASUK DB)
+* { required: 'key', optional: 'day, exclude' }
+* day= { 'monday-sunday', 'week' }
+* https://api.spoonacular.com/mealplanner/generate
+
+
+PREMIUM USER 
+- /api/users/follow
+- /api/users/shareRecipe
+- /api/recipes/searchByIngredients => api_hit
+- /api/recipes/{id_recipe}/similar => api_hit
+- /api/meals/generate => api_hit
+
+
+
+
+
+
+
+

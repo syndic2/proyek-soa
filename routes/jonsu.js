@@ -7,7 +7,7 @@ const fetch= require('node-fetch');
 
 const router= express.Router();
     
-router.post('/register', async (req, res) => {
+router.post('/users/register', async (req, res) => {
     const data= req.body;
 
     if (!Object.keys(data).every(key => data[key])) {
@@ -19,8 +19,8 @@ router.post('/register', async (req, res) => {
 
     let query= await db.executeQuery(`
         SELECT * 
-        FROM pengguna
-        WHERE email_user = '${data.email_user}'
+        FROM users
+        WHERE email_users = '${data.email_user}'
     `);
 
     if (query.rows.length) {
@@ -31,16 +31,24 @@ router.post('/register', async (req, res) => {
     }
 
     query= await db.executeQuery(`
-        INSERT INTO pengguna (id_user, email_user, nama_user, password_user, saldo_user, tipe_user, api_key, api_hit)
-        VALUES (
+        INSERT INTO users (
+            id_users, 
+            email_users, 
+            nama_users, 
+            password_users, 
+            saldo_users, 
+            tipe_users, 
+            api_key, 
+            api_hit
+        ) VALUES (
             0,
-            '${data.email_user}',
-            '${data.nama_user}',
-            '${data.password_user}',
+            '${data.email_users}',
+            '${data.nama_users}',
+            '${data.password_users}',
             0,
             0,
             '${getAPIKey()}',
-            10
+            0
         ) 
     `);
 
@@ -57,7 +65,7 @@ router.post('/register', async (req, res) => {
     });
 });
 
-router.post('/login', async (req, res) => {
+router.post('/users/login', async (req, res) => {
     const data= req.body;
 
     if (!Object.keys(data).every(key => data[key])) {
@@ -69,8 +77,8 @@ router.post('/login', async (req, res) => {
 
     let query= await db.executeQuery(`
         SELECT * 
-        FROM pengguna
-        WHERE email_user = '${data.email_user}'
+        FROM users
+        WHERE email_users = '${data.email_users}'
     `);
 
     if (!query.rows.length) {
@@ -81,8 +89,8 @@ router.post('/login', async (req, res) => {
     }
 
     const token= jwt.sign({
-        email_user: query.rows[0].email_user.trim(),
-        tipe_user: query.rows[0].tipe_user
+        email_user: query.rows[0].email_users.trim(),
+        tipe_user: query.rows[0].tipe_users
     }, 'corona');
 
     return res.status(200).json({
@@ -92,10 +100,10 @@ router.post('/login', async (req, res) => {
     });
 });
 
-router.get('/user', async (req, res) => {
+router.get('/users', async (req, res) => {
     let query= await db.executeQuery(`
         SELECT *
-        FROM pengguna
+        FROM users
     `);
 
     return res.status(200).json({
