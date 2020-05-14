@@ -58,7 +58,7 @@
 							"urlencoded": [
 								{
 									"key": "email_users",
-									"value": "gidion@mail.com",
+									"value": "jonsu@mail.com",
 									"type": "text"
 								},
 								{
@@ -78,6 +78,88 @@
 								"api",
 								"users",
 								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/profile",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "x-access-token",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6IjQiLCJlbWFpbF91c2VycyI6ImpvbnN1QG1haWwuY29tIiwidGlwZV91c2VycyI6MSwiaWF0IjoxNTg5NDU1MDQ4fQ.EmKvoqrFdV8yqShSMfrrZi_x-dGdnBfcSNR9VgWM8lo",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "nama_users",
+									"value": "jonsu2",
+									"type": "text"
+								},
+								{
+									"key": "gambar_users",
+									"type": "file",
+									"src": "/D:/Random_IMG/aseel.jpg"
+								},
+								{
+									"key": "old_password_users",
+									"value": "asd",
+									"type": "text"
+								},
+								{
+									"key": "confirm_password_users",
+									"value": "dsa",
+									"type": "text"
+								},
+								{
+									"key": "new_password_users",
+									"value": "dsa",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:3000/api/users/profile",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"users",
+								"profile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-access-token",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6IjQiLCJlbWFpbF91c2VycyI6ImpvbnN1QG1haWwuY29tIiwidGlwZV91c2VycyI6MSwiaWF0IjoxNTg5NDU1MDQ4fQ.EmKvoqrFdV8yqShSMfrrZi_x-dGdnBfcSNR9VgWM8lo",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost:3000/api/users/profile",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"users",
+								"profile"
 							]
 						}
 					},
