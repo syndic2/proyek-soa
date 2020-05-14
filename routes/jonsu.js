@@ -1,6 +1,7 @@
 const thirdPartyAPI= require('../thirdPartyAPI');
 const getAPIKey= require('../modules/getAPIKey');
 const verifyToken= require('../modules/verifyToken');
+const upload= require('../modules/upload');
 const asyncForEach= require('../modules/asyncForEach');
 const db= require('../database');
 
@@ -102,6 +103,93 @@ router.post('/users/login', async (req, res) => {
         status: 200,
         message: 'Login berhasil.',
         token: token
+    });
+});
+
+// /users/profile
+router.put('/users/profile', upload('./uploads', 'gambar_users'), async (req, res) => {
+    const token= req.header('x-access-token');
+    const data= req.body;
+    const verified= verifyToken(token);
+
+    data.file= req.file.originalname;
+
+    if (!verified.id_users) {
+        return res.status(verified.status).json(verified);
+    }
+
+    if (!Object.keys(data).every(key => data[key])) {
+        return res.status(400).json({
+            status: 400,
+            message: 'Field tidak boleh kosong atau gambar hanya dapat bertipe JPG dan PNG!'
+        });
+    }
+
+    if (data.new_password_users !== data.confirm_password_users) {
+        return res.status(400).json({
+            status: 400,
+            message: 'Password baru tidak sama dengan confirm password.'
+        });
+    }
+
+    let query= await db.executeQuery(`
+        SELECT *
+        FROM users
+        WHERE email_users = '${verified.email_users}' AND
+              password_users = '${data.old_password_users}'
+    `);
+
+    if (!query.rows.length) {
+        return res.status(400).json({
+            status: 400,
+            message: 'Password lama tidak sesuai.'
+        });
+    }
+
+    query= await db.executeQuery(`
+        UPDATE users
+        SET nama_users = '${data.nama_users}', gambar_users = '${data.file}', password_users = '${data.new_password_users}'
+        WHERE email_users = '${verified.email_users}'
+    `);
+
+    if (query.rowCount === 0) {
+        return res.status(500).json({
+            status: 500,
+            message: 'Terjadi kesalahan. Coba lagi.'
+        });
+    }
+
+    return res.status(200).json({
+        status: 200,
+        message: 'Ubah profile berhasil!'
+    });
+});
+
+// /users/profile
+router.get('/users/profile', async (req, res) => {
+    const token= req.header('x-access-token');
+    const verified= verifyToken(token);
+
+    if (!verified.id_users) {
+        return res.status(verified.status).json(verified);
+    }
+
+    let query= await db.executeQuery(`
+        SELECT *
+        FROM users
+        WHERE email_users = '${verified.email_users}'
+    `);
+
+    if (!query.rows.length) {
+        return res.status(500).json({
+            status: 500,
+            message: 'Terjadi kesalahan. Coba lagi.'
+        });
+    }
+
+    return res.status(200).json({
+        status: 200,
+        profile: query.rows[0]
     });
 });
 
