@@ -5,12 +5,12 @@ USER { FREE USER, PREMIUM USER}
 FITUR
 
 /api/users
-- /register => POST
-- /login => POST (JWT AUTH)
-- /topUp => POST  (TOKEN)
-- /subscribe => POST (PAYMENT MODEL, TOKEN)
-- /getPremium => PUT (TOKEN)
-- /profile => GET, PUT (TOKEN)
+- /register => POST V -> jonsu
+- /login => POST (JWT AUTH) V -> jonsu
+- /topUp => POST  (TOKEN) V -> jonsu
+- /subscribe => POST (PAYMENT MODEL, TOKEN, 50) 
+- /getPremium => PUT (TOKEN, 200000) V -> jonsu
+- /profile => GET, PUT (TOKEN) 
 - /cookPlan => GET, POST, DELETE (TOKEN)
 - /favorite => GET, POST, DELETE (TOKEN)
 - /follow => POST, GET, DELETE (TOKEN)
@@ -20,9 +20,10 @@ FITUR
 /api/recipes
 * search SUDAH TERMASUK INTRUKSI
 
-- /search?{key=k3yku}&{name=cheese}&{limit=10} => GET
+- /search?{key=k3yku}&{query=cheese}&{limit=10} => GET V -> jonsu
 * { required: 'key, name', optional: 'limit' }
-* https://api.spoonacular.com/recipes/{id}/information
+* https://api.spoonacular.com/recipes/search?query=cheese&number=2
+* https://api.spoonacular.com/recipes/{id}/information?includeNutrition=false
 
 - /searchByIngredients?{key=k3yku}&{ingredients=cheese,meat,egg}&{limit=10} => GET
 * { required: 'key, ingredients', optional: 'limit' }
