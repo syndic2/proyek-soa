@@ -9,7 +9,8 @@ const jwt= require('jsonwebtoken');
 const fetch= require('node-fetch');
 
 const router= express.Router();
-    
+
+// /users/register
 router.post('/users/register', async (req, res) => {
     const data= req.body;
 
@@ -49,7 +50,7 @@ router.post('/users/register', async (req, res) => {
             0,
             0,
             '${getAPIKey()}',
-            0
+            100
         ) 
     `);
 
@@ -66,6 +67,7 @@ router.post('/users/register', async (req, res) => {
     });
 });
 
+// /users/login
 router.post('/users/login', async (req, res) => {
     const data= req.body;
 
@@ -103,6 +105,7 @@ router.post('/users/login', async (req, res) => {
     });
 });
 
+// /users/topUp
 router.post('/users/topUp', async (req, res) => {
     const token= req.header('x-access-token');
     const data= req.body;
@@ -119,21 +122,14 @@ router.post('/users/topUp', async (req, res) => {
         });
     }
 
-    let query= await db.executeQuery(`
-        SELECT *
-        FROM users
-        WHERE email_users = '${data.email_users}' AND
-              password_users = '${data.password_users}'
-    `);
-
-    if (!query.rows.length) {
-        return res.status(404).json({
-            status: 404,
-            message: 'E-mail atau password salah!'
+    if (verified.email_users !== data.email_users) {
+        return res.status(400).json({
+            status: 400,
+            message: 'E-mail tidak cocok!'
         });
     }
 
-    query= await db.executeQuery(`
+    let query= await db.executeQuery(`
         UPDATE users
         SET saldo_users = saldo_users + ${parseInt(data.jumlah_topup)}
         WHERE email_users = '${data.email_users}'
@@ -152,6 +148,63 @@ router.post('/users/topUp', async (req, res) => {
     });
 });
 
+// /users/subscribe
+router.post('/users/subscribe', async (req, res) => {
+    const token= req.header('x-access-token');
+    const data= req.body;
+    const verified= verifyToken(token);
+
+    if (!verified.id_users) {
+        return res.status(verified.status).json(verified);
+    }
+
+    if (!Object.keys(data).every(key => data[key])) {
+        return res.status(400).json({
+            status: 400,
+            message: 'Field tidak boleh kosong!'
+        });
+    }
+
+    if (verified.email_users !== data.email_users) {
+        return res.status(400).json({
+            status: 400,
+            message: 'E-mail tidak cocok!'
+        });
+    }
+
+    let query= await db.executeQuery(`
+        SELECT *
+        FROM users
+        WHERE email_users = '${data.email_users}'
+    `);
+
+    if (query.rows[0].saldo_users < 50*parseInt(data.jumlah_hit)) {
+        return res.status(400).json({
+            status: 400,
+            message: 'Saldo tidak mencukupi.'
+        });
+    }
+
+    query= await db.executeQuery(`
+        UPDATE users
+        SET saldo_users = saldo_users - ${50*parseInt(data.jumlah_hit)}, api_hit = api_hit + ${parseInt(data.jumlah_hit)}
+        WHERE email_users = '${data.email_users}'
+    `);
+
+    if (query.rowCount === 0) {
+        return res.status(500).json({
+            status: 500,
+            message: 'Terjadi kesalahan. Coba lagi.'
+        });
+    }
+
+    return res.status(200).json({
+        status: 200,
+        message: 'Subscribe API hit berhasil!'
+    });
+});
+
+// /users/getPremium
 router.put('/users/getPremium', async (req, res) => {
     const token= req.header('x-access-token');
     const data= req.body;
@@ -168,19 +221,18 @@ router.put('/users/getPremium', async (req, res) => {
         });
     }
 
+    if (verified.email_users !== data.email_users) {
+        return res.status(400).json({
+            status: 400,
+            message: 'E-mail tidak cocok!'
+        });
+    }
+
     let query= await db.executeQuery(`
         SELECT *
         FROM users
-        WHERE email_users = '${data.email_users}' AND
-              password_users = '${data.password_users}'
+        WHERE email_users = '${data.email_users}'
     `);
-
-    if (!query.rows.length) {
-        return res.status(404).json({
-            status: 404,
-            message: 'E-mail atau password salah.'
-        });
-    }
 
     if (query.rows[0].tipe_users === 1) {
         return res.status(400).json({
@@ -215,11 +267,12 @@ router.put('/users/getPremium', async (req, res) => {
     });
 });
 
+// /recipes/search
 router.get('/recipes/search', async(req, res) => {
     const token= req.header('x-access-token');
     const verified= verifyToken(token);
 
-    if (!token.id_users) {
+    if (!verified.id_users) {
         return res.status(verified.status).json(verified);
     }
 
@@ -241,7 +294,14 @@ router.get('/recipes/search', async(req, res) => {
             status: 401,
             message: 'Anda tidak memiliki akses.'
         });
-    }   
+    } 
+    
+    if (query.rows[0].api_hit === 0) {
+        return res.status(401).json({
+            status: 401,
+            message: 'API hit habis.'
+        });
+    }
 
     let results= [];
     let fetchAPI= await fetch(`
@@ -298,7 +358,13 @@ router.get('/recipes/search', async(req, res) => {
             });
         }
     });
-    
+
+    query= await db.executeQuery(`
+        UPDATE users
+        SET api_hit = api_hit - 1
+        WHERE api_key = '${req.query.key}'
+    `);
+
     return res.status(200).json({
         status: 200,
         message: 'Pencarian berhasil.',
