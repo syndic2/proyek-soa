@@ -14,9 +14,9 @@ FITUR { YANG BERHUBUNGAN DENGAN spoonacular PAKE api_hit }
 - /getPremium => PUT (TOKEN, 200000) V -> jonsu
 - /profile => GET, PUT (TOKEN) V -> jonsu
 - /favorite => GET, POST, DELETE (TOKEN) V -> hubert
-- /follow => POST, GET, DELETE (TOKEN)  V -> hubert
-- /shareRecipe => POST, GET (TOKEN) -> hubert
-- /myRecipe => GET,POST,DELETE
+- /follow => POST, GET, DELETE (TOKEN) V -> hubert
+- /shareRecipe => POST, GET (TOKEN) V -> hubert
+- /myRecipe => GET,POST,DELETE (TOKEN)
 
 /api/recipes
 * search SUDAH TERMASUK INTRUKSI
@@ -45,6 +45,7 @@ FITUR { YANG BERHUBUNGAN DENGAN spoonacular PAKE api_hit }
 PREMIUM USER 
 - /api/users/follow
 - /api/users/shareRecipe
+- /api/myRecipe
 - /api/recipes/searchByIngredients 
 - /api/recipes/{id_recipe}/similar 
 - /api/meals/generate

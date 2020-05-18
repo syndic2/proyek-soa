@@ -97,6 +97,7 @@ router.get('/users/follow', async (req,res)=>{
     if (!verified.id_users) {
         return res.status(verified.status).json(verified);
     }
+    if(verified.tipe_users == 0) return res.status(401).json({status:401, message:"hanya user premium"})
     let query = await db.executeQuery(`
         SELECT follow_following as id_users, u.nama_users as nama_users
         FROM follow f, users u
@@ -122,6 +123,7 @@ router.post('/users/follow', async (req,res)=>{
     if (!verified.id_users) {
         return res.status(verified.status).json(verified);
     }
+    if(verified.tipe_users == 0) return res.status(401).json({status:401, message:"hanya user premium"})
     if(!datas.user_id) return res.status(400).json({
         status:400,
         message: "harus menyertakan parameter user_id"
@@ -147,6 +149,7 @@ router.delete('/users/follow', async (req,res)=>{
     if (!verified.id_users) {
         return res.status(verified.status).json(verified);
     }
+    if(verified.tipe_users == 0) return res.status(401).json({status:401, message:"hanya user premium"})
     if(!datas.user_id) return res.status(400).json({
         status:400,
         message: "harus menyertakan parameter user_id"
@@ -168,5 +171,60 @@ router.delete('/users/follow', async (req,res)=>{
             message: nama + " belum difollow"
         })
     }
+})
+router.get('/users/shareRecipe', async (req,res)=>{
+    const datas = req.body
+    const token= req.header('x-access-token');
+    const verified= verifyToken(token);
+    if (!verified.id_users) {
+        return res.status(verified.status).json(verified);
+    }
+    if(verified.tipe_users == 0) return res.status(401).json({status:401, message:"hanya user premium"})
+    const id_source = (datas.id_source)? datas.id_source : ""
+    let q = `
+        SELECT u.id_users as id_users, u.nama_users as nama_users,r.id_recipes as id_recipes, r.nama_recipes as nama_recipes, r.deskripsi_recipes as deskripsi_recipes 
+        FROM share s, recipes r, users u
+        WHERE s.share_user_id_dest = ${verified.id_users}
+            AND u.id_users = s.share_user_id_source
+            AND r.id_recipes = s.share_recipe_id`
+    if(id_source != "") q+= ` AND s.share_user_id_source = ${id_source}`
+    q += ` ORDER BY u.id_users`
+    let query = await db.executeQuery(q)
+    if(!query.rows.length)
+        return res.status(404).json({
+            status:404,
+            message: "belum pernah menerima share"
+        })
+    return res.json({
+        status:200,
+        message:"sukses",
+        data:query.rows
+    })
+})
+router.post('/users/shareRecipe', async (req,res)=>{
+    const datas = req.body
+    const token= req.header('x-access-token');
+    const verified= verifyToken(token);
+    if (!verified.id_users) {
+        return res.status(verified.status).json(verified);
+    }
+    if(verified.tipe_users == 0) return res.status(401).json({status:401, message:"hanya user premium"})
+    if(!datas.share_recipe || !datas.share_to) return res.status(400).json({status:400, message:"semua data harus terisi"})
+    if(datas.share_to == verified.id_users) return res.status(400).json({status:400, message:"tidak dapat share resep ke diri sendiri"})
+    let query = await db.executeQuery(`select * from users where id_users = ${datas.share_to}`)
+    if(!query.rows.length) return res.status(404).json({status:404, message:"user tidak ditemukan"})
+    let nama = query.rows[0].nama_users
+    query = await db.executeQuery(`select * from recipes where id_recipes = ${datas.share_recipe}`)
+    if(!query.rows.length) return res.status(404).json({status:404, message:"resep tidak ditemukan"})
+    query = await db.executeQuery(`select * from follow where follow_user = ${verified.id_users} and follow_following = ${datas.share_to}`)
+    if(!query.rows.length) return res.status(404).json({status:404, message:"belum follow " + nama})
+    query = await db.executeQuery(`select * from share where share_user_id_source = ${ verified.id_users} and share_user_id_dest = ${datas.share_to} and share_recipe_id = ${datas.share_recipe}`)
+    if(!query.rows.length){
+        let insertquery = await db.executeQuery(`insert into share (share_user_id_source, share_user_id_dest, share_recipe_id) values (${verified.id_users}, ${datas.share_to}, '${datas.share_recipe}')`)
+    }
+    return res.json({
+        status:200,
+        message: "sukses share resep ke " + nama
+    })
 })
 module.exports = router
