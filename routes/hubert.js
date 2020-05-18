@@ -90,4 +90,83 @@ router.delete('/users/favorite',async (req,res)=>{
     })
 })
 
+router.get('/users/follow', async (req,res)=>{
+    const datas = req.body
+    const token= req.header('x-access-token');
+    const verified= verifyToken(token);
+    if (!verified.id_users) {
+        return res.status(verified.status).json(verified);
+    }
+    let query = await db.executeQuery(`
+        SELECT follow_following as id_users, u.nama_users as nama_users
+        FROM follow f, users u
+        WHERE f.follow_user = ${verified.id_users}
+            and f.follow_following = u.id_users
+    `)
+    if(!query.rows.length)
+        return res.json({
+            status:200,
+            message: "belum mengikuti siapapun"
+        })
+    else
+        return res.json({
+            status:200,
+            message: "sukses",
+            data:query.rows
+        })
+})
+router.post('/users/follow', async (req,res)=>{
+    const datas = req.body
+    const token= req.header('x-access-token');
+    const verified= verifyToken(token);
+    if (!verified.id_users) {
+        return res.status(verified.status).json(verified);
+    }
+    if(!datas.user_id) return res.status(400).json({
+        status:400,
+        message: "harus menyertakan parameter user_id"
+    })
+    if(datas.user_id == verified.id_users) return res.status(400).json({status:400, message:"tidak dapat follow diri sendiri"})
+    let query = await db.executeQuery(`SELECT * FROM users WHERE id_users = ${datas.user_id}`)
+    if(!query.rows.length) return res.status(404).send({status:404, message:"id user tidak ditemukan"})
+    const nama = query.rows[0].nama_users
+    query = await db.executeQuery(`SELECT * FROM follow WHERE follow_following = ${datas.user_id} AND follow_user = ${verified.id_users}`)
+    if(!query.rows.length){
+        let insertquery = await db.executeQuery(`insert into follow values (${verified.id_users}, ${datas.user_id})`)
+    }
+    return res.json({
+        status:200,
+        message: "sukses follow " + nama
+    })
+
+})
+router.delete('/users/follow', async (req,res)=>{
+    const datas = req.body
+    const token= req.header('x-access-token');
+    const verified= verifyToken(token);
+    if (!verified.id_users) {
+        return res.status(verified.status).json(verified);
+    }
+    if(!datas.user_id) return res.status(400).json({
+        status:400,
+        message: "harus menyertakan parameter user_id"
+    })
+    if(datas.user_id == verified.id_users) return res.status(400).json({status:400, message:"tidak dapat unfollow diri sendiri"})
+    let query = await db.executeQuery(`SELECT * FROM users WHERE id_users = ${datas.user_id}`)
+    if(!query.rows.length) return res.status(404).send({status:404, message:"id user tidak ditemukan"})
+    const nama = query.rows[0].nama_users
+    query = await db.executeQuery(`SELECT * FROM follow WHERE follow_following = ${datas.user_id} AND follow_user = ${verified.id_users}`)
+    if(query.rows.length){
+        let insertquery = await db.executeQuery(`DELETE FROM follow where  follow_user = ${verified.id_users} and follow_following =  ${datas.user_id}`)
+        return res.json({
+            status:200,
+            message: "sukses unfollow " + nama
+        })
+    }else{
+        return res.json({
+            status:200,
+            message: nama + " belum difollow"
+        })
+    }
+})
 module.exports = router
