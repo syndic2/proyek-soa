@@ -13,11 +13,10 @@ FITUR { YANG BERHUBUNGAN DENGAN spoonacular PAKE api_hit }
 - /subscribe => POST (PAYMENT MODEL, TOKEN, 50) V -> jonsu
 - /getPremium => PUT (TOKEN, 200000) V -> jonsu
 - /profile => GET, PUT (TOKEN) V -> jonsu
-- /cookPlan => GET, POST, DELETE (TOKEN)
-- /favorite => GET, POST, DELETE (TOKEN)
-- /follow => POST, GET, DELETE (TOKEN)
-- /shareRecipe => POST, GET (TOKEN)
-
+- /favorite => GET, POST, DELETE (TOKEN) V -> hubert
+- /follow => POST, GET, DELETE (TOKEN) V -> hubert
+- /shareRecipe => POST, GET (TOKEN) V -> hubert
+- /myRecipe => GET,POST,DELETE (TOKEN)
 
 /api/recipes
 * search SUDAH TERMASUK INTRUKSI
@@ -27,7 +26,7 @@ FITUR { YANG BERHUBUNGAN DENGAN spoonacular PAKE api_hit }
 * https://api.spoonacular.com/recipes/search?query=cheese&number=2
 * https://api.spoonacular.com/recipes/{id}/information?includeNutrition=false
 
-- /searchByIngredients?{key=k3yku}&{ingredients=cheese,meat,egg}&{limit=10} => GET (TOKEN)
+- /searchByIngredients?{key=k3yku}&{ingredients=cheese,meat,egg}&{limit=10} => GET (TOKEN) -> hubert
 * { required: 'key, ingredients', optional: 'limit' }
 * https://api.spoonacular.com/recipes/findByIngredients
 
@@ -46,6 +45,7 @@ FITUR { YANG BERHUBUNGAN DENGAN spoonacular PAKE api_hit }
 PREMIUM USER 
 - /api/users/follow
 - /api/users/shareRecipe
+- /api/myRecipe
 - /api/recipes/searchByIngredients 
 - /api/recipes/{id_recipe}/similar 
 - /api/meals/generate
