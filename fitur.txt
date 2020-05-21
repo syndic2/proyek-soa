@@ -26,7 +26,7 @@ FITUR { YANG BERHUBUNGAN DENGAN spoonacular PAKE api_hit }
 * https://api.spoonacular.com/recipes/search?query=cheese&number=2
 * https://api.spoonacular.com/recipes/{id}/information?includeNutrition=false
 
-- /searchByIngredients?{key=k3yku}&{ingredients=cheese,meat,egg}&{limit=10} => GET (TOKEN) -> hubert
+- /searchByIngredients?{key=k3yku}&{ingredients=cheese,meat,egg}&{limit=10} => GET (TOKEN) V -> hubert
 * { required: 'key, ingredients', optional: 'limit' }
 * https://api.spoonacular.com/recipes/findByIngredients
 
