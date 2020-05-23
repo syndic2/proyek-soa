@@ -17,9 +17,13 @@ const config= {
     api_key: '816d476582ca48809294ef256fce7450'
 };
 
-router.get("/meal",async function(req,res){
+router.get("/meals/generate",async function(req,res){
     const token= req.header('x-access-token');
     const verified= verifyToken(token,true);
+    if (!verified.id_users) {
+        return res.status(verified.status).json(verified);
+    }
+
     var targetCalories = req.query.targetCalories;
     var timeFrame = req.query.timeFrame;
     let results= [];
@@ -54,9 +58,12 @@ router.get("/meal",async function(req,res){
     res.send(recipes);
 })
 
-router.get("/similiar",async function(req,res){
+router.get("/recipes/similiar",async function(req,res){
     const token= req.header('x-access-token');
     const verified= verifyToken(token,true);
+    if (!verified.id_users) {
+        return res.status(verified.status).json(verified);
+    }
     var id = req.query.id;
     var limit = req.query.limit;
     if(id==undefined)
@@ -82,11 +89,14 @@ router.get("/similiar",async function(req,res){
     }
 })
 
-router.get("/myRecipe",async function(req,res){
+router.get("/recipes/myRecipe",async function(req,res){
     const token= req.header('x-access-token');
     const verified= verifyToken(token,true);
-    var id_users = req.body.id_users;
-    let query = `select * from recipes where id_users = ${id_users}`;
+    if (!verified.id_users) {
+        return res.status(verified.status).json(verified);
+    }
+    //var id_users = req.body.id_users;
+    let query = `select * from recipes where id_users = ${verified.id_users}`;
     let hasil = await db.executeQuery(query);
     if(hasil)
     {
@@ -98,10 +108,13 @@ router.get("/myRecipe",async function(req,res){
     }
 })
 
-router.delete("/myRecipe",async function(req,res){
+router.delete("/recipes/myRecipe",async function(req,res){
     const token= req.header('x-access-token');
     const verified= verifyToken(token,true);
-    var id_users = req.body.id_users;
+    if (!verified.id_users) {
+        return res.status(verified.status).json(verified);
+    }
+    var id_users = verified.id_users;
     var id_recipes = req.body.id_recipes;
     let query = `select * from recipes where id_users = ${id_users} and id_recipes= ${id_recipes}`;
     let hasil = await db.executeQuery(query);
@@ -122,10 +135,13 @@ router.delete("/myRecipe",async function(req,res){
         res.status(404).send("Id User atau Id Recipe salah");
     }
 })
-router.put("/myRecipe",async function(req,res){
+router.put("/recipes/myRecipe",async function(req,res){
     const token= req.header('x-access-token');
     const verified= verifyToken(token,true);
-    var id_users = req.body.id_users;
+    if (!verified.id_users) {
+        return res.status(verified.status).json(verified);
+    }
+    var id_users = verified.id_users;
     var nama_recipes = req.body.nama_recipes;
     var deskripsi_recipes = req.body.deskripsi_recipes;
     var bahan_recipes = req.body.bahan_recipes;
@@ -299,12 +315,14 @@ router.put("/myRecipe",async function(req,res){
     }
 })
 
-router.post("/myRecipe",async function(req,res){
+router.post("/recipes/myRecipe",async function(req,res){
     const token= req.header('x-access-token');
     const verified= verifyToken(token,true);
-
+    if (!verified.id_users) {
+        return res.status(verified.status).json(verified);
+    }
     
-    var id_users = req.body.id_users;
+    var id_users = verified.id_users;
     var nama_recipes = req.body.nama_recipes;
     var deskripsi_recipes = req.body.deskripsi_recipes;
     var bahan_recipes = req.body.bahan_recipes;
