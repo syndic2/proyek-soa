@@ -88,8 +88,8 @@ router.post('/users/login', async (req, res) => {
 
     if (!query.rows.length) {
         return res.status(404).json({
-            status: 400,
-            message: 'E-mail atau password salah.'
+            status: 404,
+            message: 'E-mail atau password tidak ditemukan.'
         });
     }
 
