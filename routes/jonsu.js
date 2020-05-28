@@ -1,6 +1,7 @@
 const thirdPartyAPI= require('../thirdPartyAPI');
 const getAPIKey= require('../modules/getAPIKey');
 const verifyToken= require('../modules/verifyToken');
+const validateEmail= require('../modules/validateEmail');
 const upload= require('../modules/upload');
 const asyncForEach= require('../modules/asyncForEach');
 const db= require('../database');
@@ -15,10 +16,17 @@ const router= express.Router();
 router.post('/users/register', async (req, res) => {
     const data= req.body;
 
-    if (!Object.keys(data).every(key => data[key])) {
+    if (!data.email_users || !data.nama_users || !data.password_users) {
         return res.status(400).json({
             status: 400,
             message: 'Field tidak boleh kosong!'
+        });
+    }
+    
+    if (!validateEmail(data.email_users)) {
+        return res.status(400).json({
+            status: 400,
+            message: 'E-mail tidak valid!'
         });
     }
 
@@ -72,13 +80,13 @@ router.post('/users/register', async (req, res) => {
 router.post('/users/login', async (req, res) => {
     const data= req.body;
 
-    if (!Object.keys(data).every(key => data[key])) {
+    if (!data.email_users || !data.password_users) {
         return res.status(400).json({
             status: 400,
             message: 'Field tidak boleh kosong!'
         });
     }
-
+    
     let query= await db.executeQuery(`
         SELECT * 
         FROM users
@@ -103,6 +111,34 @@ router.post('/users/login', async (req, res) => {
         status: 200,
         message: 'Login berhasil.',
         token: token
+    });
+});
+
+// /users/profile
+router.get('/users/profile', async (req, res) => {
+    const token= req.header('x-access-token');
+    const verified= verifyToken(token);
+
+    if (!verified.id_users) {
+        return res.status(verified.status).json(verified);
+    }
+
+    let query= await db.executeQuery(`
+        SELECT *
+        FROM users
+        WHERE email_users = '${verified.email_users}'
+    `);
+
+    if (!query.rows.length) {
+        return res.status(500).json({
+            status: 500,
+            message: 'Terjadi kesalahan. Coba lagi.'
+        });
+    }
+
+    return res.status(200).json({
+        status: 200,
+        profile: query.rows[0]
     });
 });
 
@@ -162,34 +198,6 @@ router.put('/users/profile', upload('./uploads', 'gambar_users'), async (req, re
     return res.status(200).json({
         status: 200,
         message: 'Ubah profile berhasil!'
-    });
-});
-
-// /users/profile
-router.get('/users/profile', async (req, res) => {
-    const token= req.header('x-access-token');
-    const verified= verifyToken(token);
-
-    if (!verified.id_users) {
-        return res.status(verified.status).json(verified);
-    }
-
-    let query= await db.executeQuery(`
-        SELECT *
-        FROM users
-        WHERE email_users = '${verified.email_users}'
-    `);
-
-    if (!query.rows.length) {
-        return res.status(500).json({
-            status: 500,
-            message: 'Terjadi kesalahan. Coba lagi.'
-        });
-    }
-
-    return res.status(200).json({
-        status: 200,
-        profile: query.rows[0]
     });
 });
 
