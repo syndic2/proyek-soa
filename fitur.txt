@@ -1,4 +1,5 @@
 -- npm start AWTO NODEMON
+-- npm test AWTO MOCHA
 
 API: https://spoonacular.com/food-api/docs
 
@@ -45,7 +46,7 @@ FITUR { YANG BERHUBUNGAN DENGAN spoonacular PAKE api_hit }
 PREMIUM USER 
 - /api/users/follow
 - /api/users/shareRecipe
-- /api/myRecipe
+- /api/users/myRecipe
 - /api/recipes/searchByIngredients 
 - /api/recipes/{id_recipe}/similar 
 - /api/meals/generate

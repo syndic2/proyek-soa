@@ -1,6 +1,7 @@
 const thirdPartyAPI= require('../thirdPartyAPI');
 const getAPIKey= require('../modules/getAPIKey');
 const verifyToken= require('../modules/verifyToken');
+const validateEmail= require('../modules/validateEmail');
 const upload= require('../modules/upload');
 const asyncForEach= require('../modules/asyncForEach');
 const db= require('../database');
@@ -15,10 +16,17 @@ const router= express.Router();
 router.post('/users/register', async (req, res) => {
     const data= req.body;
 
-    if (!Object.keys(data).every(key => data[key])) {
+    if (!data.email_users || !data.nama_users || !data.password_users) {
         return res.status(400).json({
             status: 400,
             message: 'Field tidak boleh kosong!'
+        });
+    }
+    
+    if (!validateEmail(data.email_users)) {
+        return res.status(400).json({
+            status: 400,
+            message: 'E-mail tidak valid!'
         });
     }
 
@@ -72,13 +80,13 @@ router.post('/users/register', async (req, res) => {
 router.post('/users/login', async (req, res) => {
     const data= req.body;
 
-    if (!Object.keys(data).every(key => data[key])) {
+    if (!data.email_users || !data.password_users) {
         return res.status(400).json({
             status: 400,
             message: 'Field tidak boleh kosong!'
         });
     }
-
+    
     let query= await db.executeQuery(`
         SELECT * 
         FROM users
@@ -88,8 +96,8 @@ router.post('/users/login', async (req, res) => {
 
     if (!query.rows.length) {
         return res.status(404).json({
-            status: 400,
-            message: 'E-mail atau password salah.'
+            status: 404,
+            message: 'E-mail atau password tidak ditemukan.'
         });
     }
 
@@ -107,23 +115,52 @@ router.post('/users/login', async (req, res) => {
 });
 
 // /users/profile
-router.put('/users/profile', upload('./uploads', 'gambar_users'), async (req, res) => {
+router.get('/users/profile', async (req, res) => {
     const token= req.header('x-access-token');
-    const data= req.body;
     const verified= verifyToken(token);
-
-    data.file= req.file.originalname;
 
     if (!verified.id_users) {
         return res.status(verified.status).json(verified);
     }
 
-    if (!Object.keys(data).every(key => data[key])) {
-        return res.status(400).json({
-            status: 400,
-            message: 'Field tidak boleh kosong atau gambar hanya dapat bertipe JPG dan PNG!'
+    let query= await db.executeQuery(`
+        SELECT *
+        FROM users
+        WHERE email_users = '${verified.email_users}'
+    `);
+
+    if (!query.rows.length) {
+        return res.status(500).json({
+            status: 500,
+            message: 'Terjadi kesalahan. Coba lagi.'
         });
     }
+
+    return res.status(200).json({
+        status: 200,
+        profile: query.rows[0]
+    });
+});
+
+// /users/profile
+router.put('/users/profile', upload('./uploads', 'gambar_users'), async (req, res) => {
+    const token= req.header('x-access-token');
+    const data= req.body;
+    const verified= verifyToken(token);
+
+    data.file= req.file ? req.file.originalname : undefined;
+
+    if (!verified.id_users) {
+        return res.status(verified.status).json(verified);
+    }
+
+    if (!data.nama_users || !data.file || !data.old_password_users || 
+        !data.confirm_password_users || !data.new_password_users) {
+        return res.status(400).json({
+            status: 400,
+            message: 'Field tidak boleh kosong!'
+        });
+    }   
 
     if (data.new_password_users !== data.confirm_password_users) {
         return res.status(400).json({
@@ -165,34 +202,6 @@ router.put('/users/profile', upload('./uploads', 'gambar_users'), async (req, re
     });
 });
 
-// /users/profile
-router.get('/users/profile', async (req, res) => {
-    const token= req.header('x-access-token');
-    const verified= verifyToken(token);
-
-    if (!verified.id_users) {
-        return res.status(verified.status).json(verified);
-    }
-
-    let query= await db.executeQuery(`
-        SELECT *
-        FROM users
-        WHERE email_users = '${verified.email_users}'
-    `);
-
-    if (!query.rows.length) {
-        return res.status(500).json({
-            status: 500,
-            message: 'Terjadi kesalahan. Coba lagi.'
-        });
-    }
-
-    return res.status(200).json({
-        status: 200,
-        profile: query.rows[0]
-    });
-});
-
 // /users/topUp
 router.post('/users/topUp', async (req, res) => {
     const token= req.header('x-access-token');
@@ -203,13 +212,13 @@ router.post('/users/topUp', async (req, res) => {
         return res.status(verified.status).json(verified);
     }
 
-    if (!Object.keys(data).every(key => data[key])) {
+    if (!data.email_users || !data.jumlah_topup) {
         return res.status(400).json({
             status: 400,
             message: 'Field tidak boleh kosong!'
         });
     }
-
+    
     if (verified.email_users !== data.email_users) {
         return res.status(400).json({
             status: 400,
@@ -246,7 +255,7 @@ router.post('/users/subscribe', async (req, res) => {
         return res.status(verified.status).json(verified);
     }
 
-    if (!Object.keys(data).every(key => data[key])) {
+    if (!data.email_users || !data.jumlah_hit) {
         return res.status(400).json({
             status: 400,
             message: 'Field tidak boleh kosong!'
@@ -301,8 +310,8 @@ router.put('/users/getPremium', async (req, res) => {
     if (!verified.id_users) {
         return res.status(verified.status).json(verified);
     }
-
-    if (!Object.keys(data).every(key => data[key])) {
+    
+    if (!data.email_users) {
         return res.status(400).json({
             status: 400,
             message: 'Field tidak boleh kosong.'
@@ -471,6 +480,10 @@ router.get('/users', async (req, res) => {
         user: query.rows
     });
 });
+
+router.delete('/users/:id', async (req, res) => {
+    
+})
 
 router.get('/recipes', async (req, res) => {
     let query= await db.executeQuery(`
