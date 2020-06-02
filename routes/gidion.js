@@ -74,7 +74,6 @@ router.get("/meals/generate",async function(req,res){
             {
                 res.status(400).send("User salah");
             }
-
         }
         else
         {
