@@ -148,13 +148,13 @@ router.put('/users/profile', upload('./uploads', 'gambar_users'), async (req, re
     const data= req.body;
     const verified= verifyToken(token);
 
-    data.file= req.file ? req.file.originalname : undefined;
+    data.file= req.file ? req.file.originalname : 'default.png';
 
     if (!verified.id_users) {
         return res.status(verified.status).json(verified);
     }
 
-    if (!data.nama_users || !data.file || !data.old_password_users || 
+    if (!data.nama_users || !data.old_password_users || 
         !data.confirm_password_users || !data.new_password_users) {
         return res.status(400).json({
             status: 400,
@@ -188,7 +188,7 @@ router.put('/users/profile', upload('./uploads', 'gambar_users'), async (req, re
         SET nama_users = '${data.nama_users}', gambar_users = '${data.file}', password_users = '${data.new_password_users}'
         WHERE email_users = '${verified.email_users}'
     `);
-
+    
     if (query.rowCount === 0) {
         return res.status(500).json({
             status: 500,
@@ -481,9 +481,17 @@ router.get('/users', async (req, res) => {
     });
 });
 
-router.delete('/users/:id', async (req, res) => {
-    
-})
+router.delete('/users/:email_users', async (req, res) => {
+    let query= await db.executeQuery(`
+        DELETE FROM users 
+        WHERE email_users = '${req.params.email_users}'
+    `);
+
+    return res.status(200).json({
+        status: 200,
+        id_users: req.params.id_users
+    });
+});
 
 router.get('/recipes', async (req, res) => {
     let query= await db.executeQuery(`
