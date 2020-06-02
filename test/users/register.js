@@ -43,7 +43,7 @@ it('Not passed (without valid e-mail)', (done) => {
         });
 });
 
-/*it('Passed', (done) => { //HARUS VALID,
+it('Passed', (done) => { //HARUS VALID,
     chai.request(host)
         .post(endpoint)
         .send({
@@ -61,4 +61,4 @@ it('Not passed (without valid e-mail)', (done) => {
                 .delete('/api/users/test@mail.com')
                 .end(done);
         });
-});*/
+});

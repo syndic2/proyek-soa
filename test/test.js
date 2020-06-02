@@ -6,7 +6,7 @@ const importTest= (name, path) => {
 describe('/api/users', () => {
     importTest('/login', './users/login');
     importTest('/register', './users/register');
-    //importTest('/profile', './users/profile');
+    importTest('/profile', './users/profile');
     importTest('/topUp', './users/topUp');
     importTest('/subscribe', './users/subscribe');
 });

@@ -7,7 +7,7 @@ const chaiHttp= require('chai-http');
 chai.should(); //ASSERTION STYLE
 chai.use(chaiHttp);
 
-const host= server.development;
+const host= server.production;
 const endpoint= '/api/users/topUp';
 const method= 'POST';
 
