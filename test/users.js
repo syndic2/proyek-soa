@@ -26,6 +26,22 @@ describe('/api/users', () => {
                 });
         });
 
+        it('Not passed (without correct email or password)', (done) => {
+            chai.request(server.development)
+                .post('/api/users/login')
+                .send({
+                    email_users: 'jonsu',
+                    password_users: 'asd' 
+                })
+                .end((err, res) => {
+                    res.should.have.status(404);
+                    res.body.should.be.a('object');
+                    res.body.should.have.property('status').eql(404);
+                    res.body.should.have.property('message').eql('E-mail atau password tidak ditemukan.');
+                done();
+                });
+        });
+
         it('Passed', (done) => {
             chai.request(server.development)
                 .post('/api/users/login')

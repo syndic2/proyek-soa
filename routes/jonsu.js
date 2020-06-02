@@ -211,13 +211,13 @@ router.post('/users/topUp', async (req, res) => {
         return res.status(verified.status).json(verified);
     }
 
-    if (!Object.keys(data).every(key => data[key])) {
+    if (!data.email_users || !data.jumlah_topup) {
         return res.status(400).json({
             status: 400,
             message: 'Field tidak boleh kosong!'
         });
     }
-
+    
     if (verified.email_users !== data.email_users) {
         return res.status(400).json({
             status: 400,
@@ -254,7 +254,7 @@ router.post('/users/subscribe', async (req, res) => {
         return res.status(verified.status).json(verified);
     }
 
-    if (!Object.keys(data).every(key => data[key])) {
+    if (!data.email_users || !data.jumlah_hit) {
         return res.status(400).json({
             status: 400,
             message: 'Field tidak boleh kosong!'
@@ -309,8 +309,8 @@ router.put('/users/getPremium', async (req, res) => {
     if (!verified.id_users) {
         return res.status(verified.status).json(verified);
     }
-
-    if (!Object.keys(data).every(key => data[key])) {
+    
+    if (!data.email_users) {
         return res.status(400).json({
             status: 400,
             message: 'Field tidak boleh kosong.'
