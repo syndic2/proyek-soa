@@ -47,7 +47,7 @@ describe('/api/users', () => {
                 .post('/api/users/login')
                 .send({
                     email_users: 'jonsu@mail.com',
-                    password_users: 'asd' 
+                    password_users: 'dsa' 
                 })
                 .end((err, res) => {
                     token= res.body.token;
@@ -93,12 +93,12 @@ describe('/api/users', () => {
                 });
         });
 
-        /*it ('Passed', (done) => { //HARUS VALID,
+        it('Passed', (done) => { //HARUS VALID,
             chai.request(server.development)
                 .post('/api/users/register')
                 .send({
-                    email_users: 'cantik@mail.com',
-                    nama_users: 'cantik',
+                    email_users: 'rini@mail.com',
+                    nama_users: 'rini',
                     password_users: 'asd'
                 })
                 .end((err, res) => {
@@ -108,7 +108,7 @@ describe('/api/users', () => {
                     res.body.should.have.property('message').eql('Register berhasil!');
                 done();
                 });
-        });*/
+        });
     });
 
     let token;
@@ -171,5 +171,5 @@ describe('/api/users', () => {
                     });
             });
         });
-    });
+    });    
 });

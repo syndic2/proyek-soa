@@ -148,18 +148,19 @@ router.put('/users/profile', upload('./uploads', 'gambar_users'), async (req, re
     const data= req.body;
     const verified= verifyToken(token);
 
-    data.file= req.file.originalname;
+    data.file= req.file ? req.file.originalname : undefined;
 
     if (!verified.id_users) {
         return res.status(verified.status).json(verified);
     }
 
-    if (!Object.keys(data).every(key => data[key])) {
+    if (!data.nama_users || !data.file || !data.old_password_users || 
+        !data.confirm_password_users || !data.new_password_users) {
         return res.status(400).json({
             status: 400,
-            message: 'Field tidak boleh kosong atau gambar hanya dapat bertipe JPG dan PNG!'
+            message: 'Field tidak boleh kosong!'
         });
-    }
+    }   
 
     if (data.new_password_users !== data.confirm_password_users) {
         return res.status(400).json({
@@ -479,6 +480,10 @@ router.get('/users', async (req, res) => {
         user: query.rows
     });
 });
+
+router.delete('/users/:id', async (req, res) => {
+    
+})
 
 router.get('/recipes', async (req, res) => {
     let query= await db.executeQuery(`
