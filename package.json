@@ -5,7 +5,10 @@
 	"main": "app.js",
 	"scripts": {
 		"start": "nodemon app.js",
-		"test": "mocha"
+		"test": "mocha",
+		"test-users": "mocha --bail ./test/users/test.js",
+		"test-recipes": "mocha --bail ./test/recipes/test.js",
+		"test-meals": "mocha --bail ./test/meals/test.js"
 	},
 	"repository": {
 		"type": "git",

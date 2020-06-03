@@ -40,7 +40,7 @@ module.exports.withoutToken= (endpoint, method) => {
                 res.body.should.have.property('message').eql(verified.message);
             done();
         });
-    });
+    }).timeout(10000);
 };
 
 module.exports.withOutValidToken= (endpoint, method) => {
@@ -55,5 +55,5 @@ module.exports.withOutValidToken= (endpoint, method) => {
                 res.body.should.have.property('message').eql(verified.message);
             done();
         });
-    });
+    }).timeout(10000);
 };

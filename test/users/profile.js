@@ -44,7 +44,7 @@ describe('/get', () => {
                 res.body.should.have.property('profile').should.be.a('object');
             done();
             });
-    });
+    }).timeout(10000);
 });
 
 describe('/put', () => {
@@ -68,7 +68,7 @@ describe('/put', () => {
                 res.body.should.have.property('message').eql('Field tidak boleh kosong!');
             done();
             });
-    });
+    }).timeout(10000);
 
     it('Not passed (new password not equal with confirm password)', (done) => {
         chai.request(host)
@@ -87,7 +87,7 @@ describe('/put', () => {
                 res.body.should.have.property('message').eql('Password baru tidak sama dengan confirm password.');
             done();
             });
-    });
+    }).timeout(10000);
 
     it('Not passed (without valid old password)', (done) => {
         chai.request(host)
@@ -106,7 +106,7 @@ describe('/put', () => {
             
             done();
             });
-    });
+    }).timeout(10000);
 
     it('Passed', (done) => {
         chai.request(host)

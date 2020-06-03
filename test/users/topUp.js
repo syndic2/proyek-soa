@@ -44,7 +44,7 @@ it('Not passed (without fields)', (done) => {
             res.body.should.have.property('message').eql('Field tidak boleh kosong!');
         done();
         });
-});
+}).timeout(10000);
 
 it('Not passed (without valid e-mail)', (done) => {
     chai.request(host)
@@ -61,7 +61,7 @@ it('Not passed (without valid e-mail)', (done) => {
             res.body.should.have.property('message').eql('E-mail tidak cocok!');
         done();
         });
-});
+}).timeout(10000);
 
 it('Passed', (done) => {
     chai.request(host)
