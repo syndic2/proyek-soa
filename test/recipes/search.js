@@ -31,9 +31,9 @@ before((done) => {
         .get('/api/users/profile')
         .set('x-access-token', token)
         .end((err, res) => {
-            user= res.body;
+            user= res.body.profile;
         done();
-    });
+        });
 });
 
 tokenTest.withoutToken(endpoint, method);
@@ -49,7 +49,7 @@ it('Not passed (without parameter query)', (done) => {
             res.body.should.have.property('status').eql(401);
             res.body.should.have.property('message').eql('Parameter key dan query tidak boleh kosong.');
         done();
-    });
+        });
 }).timeout(10000);
 
 it('Not passed (without valid key)', (done) => {
@@ -62,23 +62,33 @@ it('Not passed (without valid key)', (done) => {
             res.body.should.have.property('status').eql(401);
             res.body.should.have.property('message').eql('Anda tidak memiliki akses.');
         done();
-    });
+        });
 }).timeout(10000);
 
 it('Not passed (without enough API Hit)', (done) => {
     chai.request(host)
-        .get(`${endpoint}?key=56LpQTEr75&query=pizza&limit=3`)
-        .set('x-access-token', token)
-        .end((err, res) => {
-            res.should.have.status(401);
-            res.body.should.be.a('object');
-            res.body.should.have.property('status').eql(401);
-            res.body.should.have.property('message').eql('API hit habis.');
-        done();
-    });
+        .put('/api/users/jonsu@mail.com')
+        .end(() => {
+            chai.request(host)
+                .get(`${endpoint}?key=56LpQTEr75&query=pizza&limit=3`)
+                .set('x-access-token', token)
+                .end((err, res) => {
+                    res.should.have.status(401);
+                    res.body.should.be.a('object');
+                    res.body.should.have.property('status').eql(401);
+                    res.body.should.have.property('message').eql('API hit habis.');
+
+                    chai.request(host)
+                        .put('/api/users/jonsu@mail.com')
+                        .send({
+                            api_hit: user.api_hit
+                        })
+                        .end(done);
+                }); 
+        });
 }).timeout(10000);
 
-/*it('Passed', (done) => {
+it('Passed', (done) => {
     chai.request(host)
         .get(`${endpoint}?key=56LpQTEr75&query=pizza&limit=3`)
         .set('x-access-token', token)
@@ -88,9 +98,15 @@ it('Not passed (without enough API Hit)', (done) => {
             res.body.should.have.property('status').eql(200);
             res.body.should.have.property('message').eql('Pencarian berhasil.');
             res.body.should.have.property('recipes').to.be.an('array');
-        done();
-    });
-}).timeout(50000);*/
+
+            chai.request(host)
+                .put('/api/users/jonsu@mail.com')
+                .send({
+                    api_hit: 1
+                })
+                .end(done);
+        });
+}).timeout(50000);
 
 
 

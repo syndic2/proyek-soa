@@ -26,7 +26,7 @@ before((done) => {
         .end((err, res) => {
             token= res.body.token;
         done();
-    });
+        });
 });
 
 describe('/get', () => {

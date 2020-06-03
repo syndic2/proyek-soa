@@ -32,13 +32,13 @@ const getRequest= (endpoint, method) => {
 module.exports.withoutToken= (endpoint, method) => {
     it('Not passed (without token)', (done) => {
         getRequest(endpoint, method).end((err, res) => {
-                const verified= verifyToken();
-                
-                res.should.have.status(verified.status);
-                res.body.should.be.a('object');
-                res.body.should.have.property('status').eql(verified.status);
-                res.body.should.have.property('message').eql(verified.message);
-            done();
+            const verified= verifyToken();
+            
+            res.should.have.status(verified.status);
+            res.body.should.be.a('object');
+            res.body.should.have.property('status').eql(verified.status);
+            res.body.should.have.property('message').eql(verified.message);
+        done();
         });
     }).timeout(10000);
 };
@@ -47,13 +47,13 @@ module.exports.withOutValidToken= (endpoint, method) => {
     it('Not passed (without valid token)', (done) => {
         getRequest(endpoint, method).set('x-access-token', 'test')
                                     .end((err, res) => {
-                const verified= verifyToken('test');
-                
-                res.should.have.status(verified.status);
-                res.body.should.be.a('object');
-                res.body.should.have.property('status').eql(verified.status);
-                res.body.should.have.property('message').eql(verified.message);
-            done();
+            const verified= verifyToken('test');
+            
+            res.should.have.status(verified.status);
+            res.body.should.be.a('object');
+            res.body.should.have.property('status').eql(verified.status);
+            res.body.should.have.property('message').eql(verified.message);
+        done();
         });
     }).timeout(10000);
 };

@@ -486,28 +486,26 @@ router.get('/users', async (req, res) => {
     });
 });
 
-router.put('/users', async (req, res) => {
-    /*const data= req.body;
+router.put('/users/:email_users', async (req, res) => {
+    const data= req.body;
     
     let api_hit= '';
 
-    if (data.api_hit) {
-        if (data.api_hit === 0) {
-            api_hit= 'SET api_hit = 0';
-        } else {
-            api_hit= `SET api_hit = api_hit + ${parseInt(data.api_hit)}`;
-        }
+    if (!data.api_hit) {
+        api_hit= 'SET api_hit = 0';
+    } else {
+        api_hit= `SET api_hit = api_hit + ${parseInt(data.api_hit)}`;
     }
 
     let query= await db.executeQuery(`
         UPDATE users
         ${api_hit}
-        WHERE email_users = '${req.query.email_users}'
-    `);*/
+        WHERE email_users = '${req.params.email_users}'
+    `);
 
     return res.status(200).json({
         status: 200,
-        email_users: req.query.email_users
+        email_users: req.params.email_users
     })
 });
 

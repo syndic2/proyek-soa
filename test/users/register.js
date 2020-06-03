@@ -60,5 +60,5 @@ it('Passed', (done) => { //HARUS VALID,
             chai.request(host) //CALLBACK REQUEST
                 .delete('/api/users/test@mail.com')
                 .end(done);
-        });
+            });
 }).timeout(10000);
