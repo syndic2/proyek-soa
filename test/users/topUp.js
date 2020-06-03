@@ -86,7 +86,7 @@ it('Passed', (done) => {
                 })
                 .end(done);
         });
-});
+}).timeout(10000);
 
 
 

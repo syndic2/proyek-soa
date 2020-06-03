@@ -61,4 +61,4 @@ it('Passed', (done) => { //HARUS VALID,
                 .delete('/api/users/test@mail.com')
                 .end(done);
         });
-});
+}).timeout(10000);

@@ -95,7 +95,7 @@ describe('/put', () => {
             .set('x-access-token', token)
             .send({
                 nama_users: 'test',
-                old_password_users: 'asd',
+                old_password_users: 'test',
                 new_password_users: 'dsa',
                 confirm_password_users: 'dsa'
             })
@@ -134,5 +134,5 @@ describe('/put', () => {
                     })
                     .end(done);
             });
-    });
+    }).timeout(10000);
 });
