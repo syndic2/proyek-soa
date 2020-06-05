@@ -148,18 +148,19 @@ router.put('/users/profile', upload('./uploads', 'gambar_users'), async (req, re
     const data= req.body;
     const verified= verifyToken(token);
 
-    data.file= req.file.originalname;
+    data.file= req.file ? req.file.originalname : 'default.png';
 
     if (!verified.id_users) {
         return res.status(verified.status).json(verified);
     }
 
-    if (!Object.keys(data).every(key => data[key])) {
+    if (!data.nama_users || !data.old_password_users || 
+        !data.confirm_password_users || !data.new_password_users) {
         return res.status(400).json({
             status: 400,
-            message: 'Field tidak boleh kosong atau gambar hanya dapat bertipe JPG dan PNG!'
+            message: 'Field tidak boleh kosong!'
         });
-    }
+    }   
 
     if (data.new_password_users !== data.confirm_password_users) {
         return res.status(400).json({
@@ -187,7 +188,7 @@ router.put('/users/profile', upload('./uploads', 'gambar_users'), async (req, re
         SET nama_users = '${data.nama_users}', gambar_users = '${data.file}', password_users = '${data.new_password_users}'
         WHERE email_users = '${verified.email_users}'
     `);
-
+    
     if (query.rowCount === 0) {
         return res.status(500).json({
             status: 500,
@@ -417,16 +418,20 @@ router.get('/recipes/search', async(req, res) => {
                 ${thirdPartyAPI.host}/${item.id}/information?apiKey=${thirdPartyAPI.api_key}&includeNutrition=false
             `);
             let informations= await fetchAPI.json();
+            let instructions= [];
 
             informations.extendedIngredients= informations.extendedIngredients.map(i => i.original);
-            informations.analyzedInstructions[0].steps= informations.analyzedInstructions[0].steps.map(i => i.step);
+            
+            if (informations.analyzedInstructions.length) {
+                instructions= informations.analyzedInstructions[0].steps.map(i => i.step);
+            }
 
             results.push({
                 id_recipes: informations.id,
                 nama_recipes: informations.title.replace(/["']/g, ""),
                 deskripsi_recipes: informations.summary.replace(/["']/g, ""),
                 bahan_recipes: informations.extendedIngredients,
-                instruksi_recipes: informations.analyzedInstructions[0].steps
+                instruksi_recipes: instructions
             });
 
             query= await db.executeQuery(`
@@ -441,7 +446,7 @@ router.get('/recipes/search', async(req, res) => {
                     '${informations.title.replace(/["']/g, "")}',
                     '${informations.summary.replace(/["']/g, "")}',
                     '${informations.extendedIngredients.join(', ').replace(/["']/g, "")}',
-                    '${informations.analyzedInstructions[0].steps.join(', ').replace(/["']/g, "")}'
+                    '${instructions.join(', ').replace(/["']/g, "")}'
                 ) 
             `);
         } else {
@@ -468,6 +473,7 @@ router.get('/recipes/search', async(req, res) => {
     });
 });
 
+//BUAT TEST
 router.get('/users', async (req, res) => {
     let query= await db.executeQuery(`
         SELECT *
@@ -477,6 +483,41 @@ router.get('/users', async (req, res) => {
     return res.status(200).json({
         status: 200,
         user: query.rows
+    });
+});
+
+router.put('/users/:email_users', async (req, res) => {
+    const data= req.body;
+    
+    let api_hit= '';
+
+    if (!data.api_hit) {
+        api_hit= 'SET api_hit = 0';
+    } else {
+        api_hit= `SET api_hit = api_hit + ${parseInt(data.api_hit)}`;
+    }
+
+    let query= await db.executeQuery(`
+        UPDATE users
+        ${api_hit}
+        WHERE email_users = '${req.params.email_users}'
+    `);
+
+    return res.status(200).json({
+        status: 200,
+        email_users: req.params.email_users
+    })
+});
+
+router.delete('/users/:email_users', async (req, res) => {
+    let query= await db.executeQuery(`
+        DELETE FROM users 
+        WHERE email_users = '${req.params.email_users}'
+    `);
+
+    return res.status(200).json({
+        status: 200,
+        email_users: req.params.email_users
     });
 });
 
