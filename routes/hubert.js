@@ -54,7 +54,7 @@ router.post('/users/favorite',async (req,res)=>{
         WHERE id_recipes = '${datas.recipe_id}'
     `);
     if(!query.rows.length){
-        return res.json({
+        return res.status(400).json({
             status:400,
             message: "recipe_id tidak valid"
         })
@@ -62,26 +62,30 @@ router.post('/users/favorite',async (req,res)=>{
     let insertquery = await db.executeQuery(`
         INSERT INTO favorite (user_id,recipe_id) VALUES ('${verified.id_users}','${datas.recipe_id}')
     `)
+    let select_id = await db.executeQuery(`
+        SELECT MAX(fav_id) as fav_id from favorite
+    `)
     return res.json({
         status:200,
+        fav_id: select_id.rows[0].fav_id,
         message: "sukses menambahkan ke favorite"
     })
 
 })
-router.delete('/users/favorite',async (req,res)=>{
-    const datas = req.body
+router.delete('/users/favorite/:fav_id',async (req,res)=>{
+    const datas = req.params
     const token= req.header('x-access-token');
     const verified= verifyToken(token);
     if (!verified.id_users) {
         return res.status(verified.status).json(verified);
     }
     if(!datas.fav_id){
-        return res.status(400).send({
+        return res.status(400).json({
             status:400,
             message: "fav_id harus disertakan"
         })
     }
-    let query = await db.executeQuery(`SELECT * FROM favorite WHERE fav_id = '${datas.fav_id}'`)
+    let query = await db.executeQuery(`SELECT * FROM favorite WHERE fav_id = '${datas.fav_id}' and user_id = ${verified.id_users}`)
     if(!query.rows.length) return res.status(404).json({status:404, message:"fav_id tidak ditemukan"})
     let deletequery = await db.executeQuery(`DELETE FROM favorite WHERE fav_id = '${datas.fav_id}'`)
     return res.json({
@@ -142,8 +146,8 @@ router.post('/users/follow', async (req,res)=>{
     })
 
 })
-router.delete('/users/follow', async (req,res)=>{
-    const datas = req.body
+router.delete('/users/follow/:user_id', async (req,res)=>{
+    const datas = req.params
     const token= req.header('x-access-token');
     const verified= verifyToken(token);
     if (!verified.id_users) {
