@@ -132,9 +132,14 @@ router.get("/recipes/similiar",async function(req,res){
                 }
                 if(results.length)
                 {
-                    let query3 = `update users set api_hit = api_hit-1 where id_users =${verified.id_users}`;
+                    let query3 = `update users set api_hit = api_hit-1 where id_users =${verified.id_users} and api_hit>0`;
                     let hasil3 = await db.executeQuery(query3);
-                    res.status(200).send(results);
+                    if(hasil3.rowCount!=0){
+                        return res.status(200).send(results);
+                    }
+                    else{
+                        return res.status(400).send("Api hit habis");
+                    }
                 }
             }
             else{

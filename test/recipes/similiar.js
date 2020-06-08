@@ -57,7 +57,7 @@ it('Not passed (without valid key)', (done) => {
         .get(`${endpoint}?api_key=test&id=700&limit=3`)
         .set('x-access-token', token)
         .end((err, res) => {
-            res.should.have.status(400);
+            res.should.have.status(404);
             res.text.should.be.eql('Api key tidak valid');
             // res.body.should.have.property('status').eql(401);
             // res.body.should.have.property('message').eql('Anda tidak memiliki akses.');
