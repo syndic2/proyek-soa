@@ -18,6 +18,7 @@ const config= {
 };
 
 router.get("/meals/generate",async function(req,res){
+    let recipes;
     const token= req.header('x-access-token');
     const verified= verifyToken(token,true);
     if (!verified.id_users) {
@@ -41,7 +42,7 @@ router.get("/meals/generate",async function(req,res){
                 var targetCalories = req.query.targetCalories;
                 var timeFrame = req.query.timeFrame;
                 let results= [];
-                let recipes;
+                
                 if(targetCalories==undefined&&timeFrame==undefined)
                 {
                     let fetchAPI= await fetch(`
@@ -184,15 +185,15 @@ router.get("/recipes/myRecipe",async function(req,res){
     let hasil = await db.executeQuery(query);
     if(hasil)
     {
-        res.status(200).send(hasil.rows);
+        return res.status(200).send(hasil.rows);
     }
     else if(hasil.rows.length==0)
     {
-        res.status(200).send("Tidak ada resep");
+        return res.status(200).send("Tidak ada resep");
     }
     else
     {
-        res.status(404).send("Resep tidak ditemukan");
+        return res.status(404).send("Resep tidak ditemukan");
     }
 })
 
@@ -237,7 +238,7 @@ router.put("/recipes/myRecipe",async function(req,res){
     var id_recipes = req.body.id_recipes;
     if(id_users==undefined||id_recipes==undefined)
     {
-        res.status(404).send(
+        return res.status(404).send(
             "Id User dan Id Recipes harus diisi"
         );
     }
@@ -381,7 +382,7 @@ router.put("/recipes/myRecipe",async function(req,res){
                         }
                         else
                         {
-                            res.status(404).send("Salah satu field harus diisi");
+                            return res.status(404).send("Salah satu field harus diisi");
                         }
                     }
                 }
@@ -389,11 +390,11 @@ router.put("/recipes/myRecipe",async function(req,res){
             hasil2 = await db.executeQuery(query2);
             if(hasil2.rowCount != 0)
             {
-                res.status(200).send("Update Sukses");
+                return res.status(200).send("Update Sukses");
             }
             else
             {
-                res.status(400).send("Error Update");
+                return res.status(400).send("Error Update");
             }
         }
         else
@@ -418,7 +419,7 @@ router.post("/recipes/myRecipe",async function(req,res){
     var id_recipes = id_users + Math.round(Math.random()*100000000);
     if(id_users==undefined||nama_recipes==undefined||deskripsi_recipes==undefined||bahan_recipes==undefined||instruksi_recipes==undefined)
     {
-        res.status(404).send(
+        return res.status(404).send(
             "Semua field harus diisi"
         );
     }

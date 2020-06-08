@@ -7,7 +7,7 @@ const chaiHttp= require('chai-http');
 chai.should(); //ASSERTION STYLE
 chai.use(chaiHttp);
 
-const host= server.production;
+const host= server.development;
 const endpoint= '/api/recipes/similiar';
 const method= 'GET';
 
@@ -92,11 +92,10 @@ it('Passed', (done) => {
         .set('x-access-token', token)
         .end((err, res) => {
             res.should.have.status(200);
-            res.body.should.be.a('object');
-            res.body.should.have.property('status').eql(200);
+            res.body.should.be.an('array');
+            // res.body.should.have.property('status').eql(200);
             // res.body.should.have.property('message').eql('Pencarian berhasil.');
-            res.body.should.have.property('recipes').to.be.an('array');
-
+            // res.body.should.have.property('recipes').to.be.an('array');
             chai.request(host)
                 .put('/api/users/jonsu@mail.com')
                 .send({
