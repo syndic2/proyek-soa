@@ -64,15 +64,24 @@ router.get("/meals/generate",async function(req,res){
                 );
                 recipes= await fetchAPI.json();
             }
-            let query = `update users set api_hit = api_hit-1 where id_users =${verified.id_users}`;
-            let hasil = await db.executeQuery(query);
-            if(hasil.rowCount!=0)
+            let querycekhit = `select * from users where api_hit>0 and id_users = ${verified.id_users}`;
+            let hasilcekhit = await executeQuery(querycekhit);
+            //console.log(hasilcekhit);
+            if(hasilcekhit.rows.length>0)
             {
-                res.status(200).send(recipes);
+                let query = `update users set api_hit = api_hit-1 where id_users =${verified.id_users}`;
+                let hasil = await db.executeQuery(query);
+                if(hasil.rowCount!=0)
+                {
+                    res.status(200).send(recipes);
+                }
+                // else
+                // {
+                //     res.status(400).send("Api hit habis");
+                // }
             }
-            else
-            {
-                res.status(400).send("User salah");
+            else{
+                res.status(400).send("Api hit habis");
             }
         }
         else
