@@ -29,6 +29,26 @@ router.get("/meals/generate",async function(req,res){
         return res.status(400).send("Api Key tidak ada");
     }
     else{
+    let querycekhit = `select * from users where api_hit>0 and id_users = ${verified.id_users}`;
+    let hasilcekhit = await executeQuery(querycekhit);
+    //console.log(hasilcekhit);
+    if(hasilcekhit.rows.length>0)
+    {
+        let query = `update users set api_hit = api_hit-1 where id_users =${verified.id_users}`;
+        let hasil = await db.executeQuery(query);
+        if(hasil.rowCount!=0)
+        {
+            res.status(200).send(recipes);
+        }
+        // else
+        // {
+        //     res.status(400).send("Api hit habis");
+        // }
+    }
+    else{
+            res.status(400).send("Api hit habis");
+        }
+    }
         let queryapi = `select * from users where id_users = ${verified.id_users} and api_key='${api_key}'`;
         let hasilapi = await db.executeQuery(queryapi);
         if(hasilapi.rows.length>0)
@@ -64,31 +84,13 @@ router.get("/meals/generate",async function(req,res){
                 );
                 recipes= await fetchAPI.json();
             }
-            let querycekhit = `select * from users where api_hit>0 and id_users = ${verified.id_users}`;
-            let hasilcekhit = await executeQuery(querycekhit);
-            //console.log(hasilcekhit);
-            if(hasilcekhit.rows.length>0)
-            {
-                let query = `update users set api_hit = api_hit-1 where id_users =${verified.id_users}`;
-                let hasil = await db.executeQuery(query);
-                if(hasil.rowCount!=0)
-                {
-                    res.status(200).send(recipes);
-                }
-                // else
-                // {
-                //     res.status(400).send("Api hit habis");
-                // }
-            }
-            else{
-                res.status(400).send("Api hit habis");
-            }
+            
         }
         else
         {
             return res.status(400).send("Api Key tidak valid"); 
         }
-    }
+
 })
 
 router.get("/recipes/similiar",async function(req,res){
