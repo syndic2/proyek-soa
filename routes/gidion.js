@@ -35,63 +35,61 @@ router.get("/meals/generate",async function(req,res){
         if(hasilcekhit.rows.length>0)
         {
             let queryapi = `select * from users where id_users = ${verified.id_users} and api_key='${api_key}'`;
-        let hasilapi = await db.executeQuery(queryapi);
-        if(hasilapi.rows.length>0)
-        {
-            var targetCalories = req.query.targetCalories;
-            var timeFrame = req.query.timeFrame;
-            let results= [];
-            let recipes;
-            if(targetCalories==undefined&&timeFrame==undefined)
+            let hasilapi = await db.executeQuery(queryapi);
+            if(hasilapi.rows.length>0)
             {
-                let fetchAPI= await fetch(`
-                    ${config.host}?apiKey=${config.api_key}`
-                );
-                recipes= await fetchAPI.json();
+                var targetCalories = req.query.targetCalories;
+                var timeFrame = req.query.timeFrame;
+                let results= [];
+                let recipes;
+                if(targetCalories==undefined&&timeFrame==undefined)
+                {
+                    let fetchAPI= await fetch(`
+                        ${config.host}?apiKey=${config.api_key}`
+                    );
+                    recipes= await fetchAPI.json();
+                }
+                else if(targetCalories!=undefined&&timeFrame==undefined)
+                {
+                    let fetchAPI= await fetch(`
+                        ${config.host}?apiKey=${config.api_key}&targetCalories=${targetCalories}`
+                    );
+                    recipes= await fetchAPI.json();
+                }
+                else if(targetCalories!=undefined&&timeFrame==undefined)
+                {
+                    let fetchAPI= await fetch(`
+                        ${config.host}?apiKey=${config.api_key}&timeFrame=${timeFrame}`
+                    );
+                    recipes= await fetchAPI.json();
+                }
+                else{
+                    let fetchAPI= await fetch(`
+                        ${config.host}?apiKey=${config.api_key}&targetCalories=${targetCalories}&timeFrame=${timeFrame}`
+                    );
+                    recipes= await fetchAPI.json();
+                }
+                
             }
-            else if(targetCalories!=undefined&&timeFrame==undefined)
+            else
             {
-                let fetchAPI= await fetch(`
-                    ${config.host}?apiKey=${config.api_key}&targetCalories=${targetCalories}`
-                );
-                recipes= await fetchAPI.json();
+                return res.status(400).send("Api Key tidak valid"); 
             }
-            else if(targetCalories!=undefined&&timeFrame==undefined)
+            let query = `update users set api_hit = api_hit-1 where id_users =${verified.id_users}`;
+            let hasil = await db.executeQuery(query);
+            if(hasil.rowCount!=0)
             {
-                let fetchAPI= await fetch(`
-                    ${config.host}?apiKey=${config.api_key}&timeFrame=${timeFrame}`
-                );
-                recipes= await fetchAPI.json();
+                res.status(200).send(recipes);
             }
-            else{
-                let fetchAPI= await fetch(`
-                    ${config.host}?apiKey=${config.api_key}&targetCalories=${targetCalories}&timeFrame=${timeFrame}`
-                );
-                recipes= await fetchAPI.json();
-            }
-            
-        }
-        else
-        {
-            return res.status(400).send("Api Key tidak valid"); 
-        }
-        let query = `update users set api_hit = api_hit-1 where id_users =${verified.id_users}`;
-        let hasil = await db.executeQuery(query);
-        if(hasil.rowCount!=0)
-        {
-            res.status(200).send(recipes);
-        }
-        // else
-        // {
-        //     res.status(400).send("Api hit habis");
-        // }
+            // else
+            // {
+            //     res.status(400).send("Api hit habis");
+            // }
         }
         else{
             return res.status(400).send("Api hit habis");
         }
     }
-        
-
 })
 
 router.get("/recipes/similiar",async function(req,res){
@@ -116,7 +114,7 @@ router.get("/recipes/similiar",async function(req,res){
             let results= [];
             if(id==undefined)
             {
-                res.send("Id harus diisi");
+                return res.status(400).send("Id harus diisi");
             }
             
             else if(limit!=undefined)
@@ -152,9 +150,14 @@ router.get("/recipes/similiar",async function(req,res){
                 }
                 if(results.length)
                 {
-                    let query3 = `update users set api_hit = api_hit-1 where id_users =${verified.id_users}`;
+                    let query3 = `update users set api_hit = api_hit-1 where id_users =${verified.id_users} and api_hit>0`;
                     let hasil3 = await db.executeQuery(query3);
-                    res.status(200).send(results);
+                    if(hasil3.rowCount!=0){
+                        return res.status(200).send(results);
+                    }
+                    else{
+                        return res.status(400).send("Api hit habis");
+                    }
                 }
             }
         }
