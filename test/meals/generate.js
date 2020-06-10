@@ -57,7 +57,6 @@ it('Not passed (without valid key)', (done) => {
         .get(`${endpoint}?api_key=test&targetCalories=2000&timeFrame='day'`)
         .set('x-access-token', token)
         .end((err, res) => {
-            console.log(res.text);
             res.should.have.status(400);
             res.text.should.be.eql('Api Key tidak valid');
             // res.body.should.have.property('status').eql(400);

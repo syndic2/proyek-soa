@@ -17,10 +17,11 @@ FITUR { YANG BERHUBUNGAN DENGAN spoonacular PAKE api_hit }
 - /favorite => GET, POST, DELETE (TOKEN) V -> hubert
 - /follow => POST, GET, DELETE (TOKEN) V -> hubert
 - /shareRecipe => POST, GET (TOKEN) V -> hubert
-- /myRecipe => GET,POST,DELETE (TOKEN)
 
 /api/recipes
 * search SUDAH TERMASUK INTRUKSI
+
+- /myRecipe => GET, POST, DELETE (TOKEN)
 
 - /search?{key=k3yku}&{query=cheese}&{limit=10} => GET (TOKEN) V -> jonsu
 * { required: 'key, name', optional: 'limit' }
@@ -46,7 +47,7 @@ FITUR { YANG BERHUBUNGAN DENGAN spoonacular PAKE api_hit }
 PREMIUM USER 
 - /api/users/follow
 - /api/users/shareRecipe
-- /api/users/myRecipe
+- /api/recipes/myRecipe
 - /api/recipes/searchByIngredients 
 - /api/recipes/{id_recipe}/similar 
 - /api/meals/generate
