@@ -231,6 +231,7 @@ router.put("/recipes/myRecipe",async function(req,res){
         return res.status(verified.status).json(verified);
     }
     var id_users = verified.id_users;
+    console.log(verified);
     var nama_recipes = req.body.nama_recipes;
     var deskripsi_recipes = req.body.deskripsi_recipes;
     var bahan_recipes = req.body.bahan_recipes;
@@ -244,8 +245,12 @@ router.put("/recipes/myRecipe",async function(req,res){
     }
     else
     {
+        console.log(id_users);
+        console.log(id_recipes);
+        
         let query = `select * from recipes where id_users =${id_users} and id_recipes=${id_recipes}`;
         let hasil = await db.executeQuery(query);
+        console.log(hasil);
         let query2,hasil2;
         if(hasil.rows.length>0)
         {
@@ -451,7 +456,10 @@ router.post("/recipes/myRecipe",async function(req,res){
         let hasil2 = await db.executeQuery(query2);
         if(hasil2)
         {
-            res.status(200).send("Success Add Resep");
+            res.status(200).send({
+                "msg" : "Success Add Resep",
+                "id_recipes" : id_recipes
+            });
         }
         else
         {

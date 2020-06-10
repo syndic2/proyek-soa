@@ -7,7 +7,7 @@ const chaiHttp= require('chai-http');
 chai.should(); //ASSERTION STYLE
 chai.use(chaiHttp);
 
-const host= server.development;
+const host= server.production;
 const endpoint= '/api/meals/generate';
 const method= 'GET';
 
@@ -92,9 +92,10 @@ it('Not passed (without enough API Hit)', (done) => {
 
 it('Passed', (done) => {
     chai.request(host)
-        .get(`${endpoint}?apiKey=56LpQTEr75&targetCalories=2000&timeFrame=day`)
+        .get(`${endpoint}?api_key=56LpQTEr75&targetCalories=2000&timeFrame=day`)
         .set('x-access-token', token)
         .end((err, res) => {
+            // console.log(res.text);
             res.should.have.status(200);
             res.body.should.be.a('object');
             // res.body.should.have.property('status').eql(200);

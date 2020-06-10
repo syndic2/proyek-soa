@@ -7,7 +7,7 @@ const chaiHttp= require('chai-http');
 chai.should(); //ASSERTION STYLE
 chai.use(chaiHttp);
 
-const host= server.development;
+const host= server.production;
 const endpoint= '/api/recipes/myRecipe';
 const method= 'POST';
 
@@ -86,33 +86,35 @@ describe('/post',()=>{
             });
     }).timeout(10000);
 
-    // it('Passed', (done) => {
-    //     chai.request(host)
-    //         .post(`${endpoint}`)
-    //         .set('x-access-token', token)
-    //         .send({
-    //             id_users: 19,
-    //             id_recipes:195788932,
-    //             nama_recipes: "makananku",
-    //             deskripsi_recipes:"ini makananku",
-    //             bahan_recipes:"telur",
-    //             instruksi_recipes:"dimasak"
-    //         })
-    //         .end((err, res) => {
-    //             res.should.have.status(200);
-    //             res.text.should.be.eql('Success Add Resep');
-
-    //             // res.body.should.have.property('status').eql(200);
-    //             // res.body.should.have.property('message').eql('Pencarian berhasil.');
-    //             // res.body.should.have.property('recipes').to.be.an('array');
-    //             // chai.request(host)
-    //             //     .put('/api/users/jonsu@mail.com')
-    //             //     .send({
-    //             //         api_hit: 1
-    //             //     })
-    //             //     .end(done);
-    //         });
-    // }).timeout(50000);
+    it('Passed', (done) => {
+        chai.request(host)
+            .post(`${endpoint}`)
+            .set('x-access-token', token)
+            .send({
+                id_users: 4,
+                nama_recipes: "makananku",
+                deskripsi_recipes:"ini makananku",
+                bahan_recipes:"telur",
+                instruksi_recipes:"dimasak"
+            })
+            .end((err, res) => {
+                fav_id=res.body.id_recipes;
+                res.should.have.status(200);
+                res.body.should.be.a('object');
+                res.body.should.have.property('msg').eql('Success Add Resep');
+                
+                // res.body.should.have.property('status').eql(200);
+                // res.body.should.have.property('message').eql('Pencarian berhasil.');
+                // res.body.should.have.property('recipes').to.be.an('array');
+                // chai.request(host)
+                //     .put('/api/users/jonsu@mail.com')
+                //     .send({
+                //         api_hit: 1
+                //     })
+                //     .end(done);
+            done();
+            });
+    }).timeout(50000);
 })
 
 describe('/put',()=>{
@@ -136,47 +138,26 @@ describe('/put',()=>{
             });
     }).timeout(10000);
 
-    // it('Not passed (without one of the fields)', (done) => {
-    //     chai.request(host)
-    //         .put(endpoint)
-    //         .set('x-access-token', token)
-    //         .send({
-    //             id_users:19,
-    //             id_recipes:195788934,
-    //             nama_recipes:undefined,
-    //             deskripsi_recipes:undefined,
-    //             bahan_recipes:undefined,
-    //             instruksi_recipes:undefined
-    //         })
-    //         .end((err, res) => {
-    //             res.should.have.status(404);
-    //             res.text.should.be.eql('Salah satu field harus diisi');
-    //             // res.body.should.have.property('status').eql(400);
-    //             // res.body.should.have.property('message').eql('Field tidak boleh kosong!');
-    //         done();
-    //         });
-    // }).timeout(10000);
-
-    // it('Passed', (done) => {
-    //     chai.request(host)
-    //         .put(endpoint)
-    //         .set('x-access-token', token)
-    //         .send({
-    //             id_users:1,
-    //             id_recipes:195788934,
-    //             nama_recipes:"test",
-    //             deskripsi_recipes:"test",
-    //             bahan_recipes:"test",
-    //             instruksi_recipes:"test"
-    //         })
-    //         .end((err, res) => {
-    //             res.should.have.status(200);
-    //             res.text.should.be.eql('Update Sukses');
-    //             // res.body.should.have.property('status').eql(400);
-    //             // res.body.should.have.property('message').eql('Field tidak boleh kosong!');
-    //         done();
-    //         });
-    // }).timeout(10000);
+    it('Passed', (done) => {
+        chai.request(host)
+            .put(endpoint)
+            .set('x-access-token', token)
+            .send({
+                id_recipes:fav_id,
+                nama_recipes:"test",
+                deskripsi_recipes:"test",
+                bahan_recipes:"test",
+                instruksi_recipes:"test"
+            })
+            .end((err, res) => {
+                // console.log(res.text);
+                res.should.have.status(200);
+                res.text.should.be.eql('Update Sukses');
+                // res.body.should.have.property('status').eql(400);
+                // res.body.should.have.property('message').eql('Field tidak boleh kosong!');
+            done();
+            });
+    }).timeout(10000);
 })
 
 describe('/delete', ()=>{
@@ -228,13 +209,13 @@ describe('/delete', ()=>{
             })
     }).timeout(10000);
 
-    it('Pass', (done)=>{
+    it('Passed', (done)=>{
         chai.request(host)
             .del(endpoint)
             .set('x-access-token', token)
             .send({
-                id_users:1,
-                id_recipes:195788934,
+                id_users:4,
+                id_recipes:fav_id,
             })
             .end((err,res)=>{
                 res.should.have.status(200);
