@@ -124,11 +124,10 @@ describe('/post', () => {
     }).timeout(10000);
 });
 
-
 describe('/delete', ()=>{
-    tokenTest.withoutToken(endpoint, 'DELETE');
-    tokenTest.withOutValidToken(endpoint, 'DELETE');
-
+    tokenTest.withoutToken(endpoint+'/0', 'DELETE');
+    tokenTest.withOutValidToken(endpoint+'/0', 'DELETE');
+    
     /*
     it('Not Passed (without field)', (done)=>{
         chai.request(host)
