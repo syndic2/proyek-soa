@@ -178,10 +178,9 @@ describe('/post', () => {
     }).timeout(10000);
 });
 
-
 describe('/delete', ()=>{
-    tokenTest.withoutToken(endpoint, 'DELETE');
-    tokenTest.withOutValidToken(endpoint, 'DELETE');
+    tokenTest.withoutToken(endpoint+'/4', 'DELETE');
+    tokenTest.withOutValidToken(endpoint+'/4', 'DELETE');
 
     it('Not Pass (not premium)', (done) => {
         chai.request(host)
