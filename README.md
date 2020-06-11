@@ -22,6 +22,7 @@ RESOURCE MEALS -> npm run test-meals
     - /profile
     - /topUp
     - /subscribe
+    - /getPremium
     - /favorite
     - /follow
     - /shareRecipe

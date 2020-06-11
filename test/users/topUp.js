@@ -63,6 +63,23 @@ it('Not passed (without valid e-mail)', (done) => {
         });
 }).timeout(10000);
 
+it('Not passed (without valid amount of top up)', (done) => {
+    chai.request(host)
+        .post(endpoint)
+        .set('x-access-token', token)
+        .send({
+            email_users: 'jonsu@mail.com',
+            jumlah_topup: -1
+        })
+        .end((err, res) => {
+            res.should.have.status(400);
+            res.body.should.be.a('object');
+            res.body.should.have.property('status').eql(400);
+            res.body.should.have.property('message').eql('Jumlah top up tidak valid!');
+        done();
+        });
+}).timeout(10000);
+
 it('Passed', (done) => {
     chai.request(host)
         .post(endpoint)
@@ -78,11 +95,9 @@ it('Passed', (done) => {
             res.body.should.have.property('message').eql('Top up berhasil!');
             
             chai.request(host)
-                .post(endpoint)
-                .set('x-access-token', token)
+                .put('/api/users/jonsu@mail.com')
                 .send({
-                    email_users: 'jonsu@mail.com',
-                    jumlah_topup: -5000
+                    saldo_users: -5000
                 })
                 .end(done);
         });

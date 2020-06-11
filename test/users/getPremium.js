@@ -8,8 +8,8 @@ chai.should(); //ASSERTION STYLE
 chai.use(chaiHttp);
 
 const host= server.production;
-const endpoint= '/api/users/subscribe';
-const method= 'POST';
+const endpoint= '/api/users/getPremium';
+const method= 'PUT';
 
 let token, user;
 
@@ -41,11 +41,10 @@ tokenTest.withOutValidToken(endpoint, method);
 
 it('Not passed (without fields)', (done) => {
     chai.request(host)
-        .post(endpoint)
+        .put(endpoint)
         .set('x-access-token', token)
         .send({
             email_users: undefined,
-            jumlah_hit: undefined
         })
         .end((err, res) => {
             res.should.have.status(400);
@@ -58,11 +57,10 @@ it('Not passed (without fields)', (done) => {
 
 it('Not passed (without valid e-mail)', (done) => {
     chai.request(host)
-        .post(endpoint)
+        .put(endpoint)
         .set('x-access-token', token)
         .send({
-            email_users: 'test@mail.com',
-            jumlah_hit: 20000
+            email_users: 'test@mail.com'
         })
         .end((err, res) => {
             res.should.have.status(400);
@@ -73,20 +71,32 @@ it('Not passed (without valid e-mail)', (done) => {
         });
 }).timeout(10000);
 
-it('Not passed (without valid amount of hit)', (done) => {
+it('Not passed (because already premium account)', (done) => {
     chai.request(host)
-        .post(endpoint)
-        .set('x-access-token', token)
+        .put('/api/users/jonsu@mail.com')
         .send({
-            email_users: 'jonsu@mail.com',
-            jumlah_hit: -1
+            tipe_users: 1
         })
-        .end((err, res) => {
-            res.should.have.status(400);
-            res.body.should.be.a('object');
-            res.body.should.have.property('status').eql(400);
-            res.body.should.have.property('message').eql('Jumlah hit tidak valid!');
-        done();
+        .end(() => {
+            chai.request(host)
+                .put(endpoint)
+                .set('x-access-token', token)
+                .send({
+                    email_users: 'jonsu@mail.com'
+                })
+                .end((err, res) => {
+                    res.should.have.status(400);
+                    res.body.should.be.a('object');
+                    res.body.should.have.property('status').eql(400);
+                    res.body.should.have.property('message').eql('Sudah menjadi akun premium.');
+                    
+                    chai.request(host)
+                        .put('/api/users/jonsu@mail.com')
+                        .send({
+                            tipe_users: user.tipe_users
+                        })
+                        .end(done);
+                });      
         });
 }).timeout(10000);
 
@@ -94,15 +104,15 @@ it('Not passed (without enough balance)', (done) => {
     chai.request(host)
         .put('/api/users/jonsu@mail.com')
         .send({
-            saldo_users: -1
+            saldo_users: -1,
+            tipe_users: -1,
         })
         .end(() => {
             chai.request(host)
-                .post(endpoint)
+                .put(endpoint)
                 .set('x-access-token', token)
                 .send({
-                    email_users: 'jonsu@mail.com',
-                    jumlah_hit: 100
+                    email_users: 'jonsu@mail.com'
                 })
                 .end((err, res) => {
                     res.should.have.status(400);
@@ -113,36 +123,44 @@ it('Not passed (without enough balance)', (done) => {
                     chai.request(host)
                         .put('/api/users/jonsu@mail.com')
                         .send({
-                            saldo_users: user.saldo_users
+                            saldo_users: user.saldo_users,
+                            tipe_users: user.tipe_users
                         })
                         .end(done);
-                });
+                });      
         });
 }).timeout(10000);
 
 it('Passed', (done) => {
     chai.request(host)
-        .post(endpoint)
-        .set('x-access-token', token)
+        .put('/api/users/jonsu@mail.com')
         .send({
-            email_users: 'jonsu@mail.com',
-            jumlah_hit: 100
+            tipe_users: -1,
         })
-        .end((err, res) => {
-            res.should.have.status(200);
-            res.body.should.be.a('object');
-            res.body.should.have.property('status').eql(200);
-            res.body.should.have.property('message').eql('Subscribe API hit berhasil!');
-
+        .end(() => {
             chai.request(host)
-                .put('/api/users/jonsu@mail.com')
+                .put(endpoint)
+                .set('x-access-token', token)
                 .send({
-                    api_hit: -100,
-                    saldo_users: 100*50
+                    email_users: 'jonsu@mail.com'
                 })
-            .end(done);
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a('object');
+                    res.body.should.have.property('status').eql(200);
+                    res.body.should.have.property('message').eql('Get premium akun berhasil!');
+                    
+                    chai.request(host)
+                        .put('/api/users/jonsu@mail.com')
+                        .send({
+                            saldo_users: 200000,
+                            tipe_users: user.tipe_users
+                        })
+                        .end(done);
+                });      
         });
 }).timeout(10000);
+
 
 
 

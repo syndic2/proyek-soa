@@ -226,6 +226,13 @@ router.post('/users/topUp', async (req, res) => {
         });
     }
 
+    if (parseInt(data.jumlah_topup) <= 0) {
+        return res.status(400).json({
+            status: 400,
+            message: 'Jumlah top up tidak valid!'
+        });
+    }
+    
     let query= await db.executeQuery(`
         UPDATE users
         SET saldo_users = saldo_users + ${parseInt(data.jumlah_topup)}
@@ -266,6 +273,13 @@ router.post('/users/subscribe', async (req, res) => {
         return res.status(400).json({
             status: 400,
             message: 'E-mail tidak cocok!'
+        });
+    }
+
+    if (parseInt(data.jumlah_hit) <= 0) {
+        return res.status(400).json({
+            status: 400,
+            message: 'Jumlah hit tidak valid!'
         });
     }
 
@@ -314,7 +328,7 @@ router.put('/users/getPremium', async (req, res) => {
     if (!data.email_users) {
         return res.status(400).json({
             status: 400,
-            message: 'Field tidak boleh kosong.'
+            message: 'Field tidak boleh kosong!'
         });
     }
 
@@ -347,7 +361,7 @@ router.put('/users/getPremium', async (req, res) => {
 
     query= await db.executeQuery(`
         UPDATE users
-        SET saldo_users = saldo_users - ${query.rows[0].saldo_users}, tipe_users = 1
+        SET saldo_users = saldo_users - ${200000}, tipe_users = 1
         WHERE email_users = '${data.email_users}'
     `);
 
@@ -489,17 +503,37 @@ router.get('/users', async (req, res) => {
 router.put('/users/:email_users', async (req, res) => {
     const data= req.body;
     
-    let api_hit= '';
+    let update= '';
 
-    if (!data.api_hit) {
-        api_hit= 'SET api_hit = 0';
-    } else {
-        api_hit= `SET api_hit = api_hit + ${parseInt(data.api_hit)}`;
+    if (data.api_hit) {
+        if (parseInt(data.api_hit) === -1) {
+            update= 'SET api_hit = 0';
+        } else {
+            update= `SET api_hit = api_hit + ${parseInt(data.api_hit)}`;
+        }
+    }
+    
+    if (data.saldo_users) {
+        if (parseInt(data.saldo_users) === -1) {
+            update+= update === '' ? `SET saldo_users = 0` : `, saldo_users = 0`;
+        } else {
+            update+= update === '' ? 
+                `SET saldo_users = saldo_users + ${parseInt(data.saldo_users)}` 
+            : `, saldo_users = saldo_users + ${parseInt(data.saldo_users)}`;
+        }
+    }
+
+    if (data.tipe_users) {
+        if (parseInt(data.tipe_users) === -1) {
+            update+= update === '' ? `SET tipe_users = 0` : `, tipe_users = 0`;
+        } else {
+            update+= update === '' ? `SET tipe_users = 1` : `, tipe_users = 1`;
+        }
     }
 
     let query= await db.executeQuery(`
         UPDATE users
-        ${api_hit}
+        ${update}
         WHERE email_users = '${req.params.email_users}'
     `);
 

@@ -41,8 +41,8 @@ before((done) => {
 });
 
 describe('/get', () => {
-    tokenTest.withoutToken(endpoint, method);
-    tokenTest.withOutValidToken(endpoint, method);
+    tokenTest.withoutToken(endpoint, 'GET');
+    tokenTest.withOutValidToken(endpoint, 'GET');
 
     it('Passed (no favorite found)', (done) => {
         chai.request(host)
@@ -73,8 +73,8 @@ describe('/get', () => {
 });
 
 describe('/post', () => {
-    tokenTest.withoutToken(endpoint, method);
-    tokenTest.withOutValidToken(endpoint, method);
+    tokenTest.withoutToken(endpoint, 'POST');
+    tokenTest.withOutValidToken(endpoint, 'POST');
 
     it('Not Passed (without field)', (done)=>{
         chai.request(host)
@@ -126,8 +126,8 @@ describe('/post', () => {
 
 
 describe('/delete', ()=>{
-    tokenTest.withoutToken(endpoint, method);
-    tokenTest.withOutValidToken(endpoint, method);
+    tokenTest.withoutToken(endpoint, 'DELETE');
+    tokenTest.withOutValidToken(endpoint, 'DELETE');
 
     /*
     it('Not Passed (without field)', (done)=>{

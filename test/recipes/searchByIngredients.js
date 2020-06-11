@@ -68,6 +68,9 @@ it('Not passed (without valid key)', (done) => {
 it('Not passed (without enough API Hit)', (done) => {
     chai.request(host)
         .put('/api/users/jonsu@mail.com')
+        .send({
+            api_hit: -1
+        })
         .end(() => {
             chai.request(host)
                 .get(`${endpoint}?key=56LpQTEr75&ingredient=pork,noodle&limit=3`)

@@ -224,8 +224,7 @@ describe('/delete', ()=>{
                 // res.body.should.have.property('message').eql('id user tidak ditemukan');
                 done();
             })
-    }).timeout(10000);
-    
+    }).timeout(10000);  
 })
 
 

@@ -40,6 +40,7 @@ before((done) => {
         done();
     });
 });
+
 before((done) => {
     chai.request(host)
         .post('/api/users/login')
@@ -54,8 +55,8 @@ before((done) => {
 });
 
 describe('/get', () => {
-    tokenTest.withoutToken(endpoint, method);
-    tokenTest.withOutValidToken(endpoint, method);
+    tokenTest.withoutToken(endpoint, 'GET');
+    tokenTest.withOutValidToken(endpoint, 'GET');
 
     it('Not Pass (not premium)', (done) => {
         chai.request(host)
@@ -99,8 +100,8 @@ describe('/get', () => {
 });
 
 describe('/post', () => {
-    tokenTest.withoutToken(endpoint, method);
-    tokenTest.withOutValidToken(endpoint, method);
+    tokenTest.withoutToken(endpoint, 'POST');
+    tokenTest.withOutValidToken(endpoint, 'POST');
 
     it('Not Pass (not premium)', (done) => {
         chai.request(host)
@@ -179,8 +180,8 @@ describe('/post', () => {
 
 
 describe('/delete', ()=>{
-    tokenTest.withoutToken(endpoint, method);
-    tokenTest.withOutValidToken(endpoint, method);
+    tokenTest.withoutToken(endpoint, 'DELETE');
+    tokenTest.withOutValidToken(endpoint, 'DELETE');
 
     it('Not Pass (not premium)', (done) => {
         chai.request(host)
